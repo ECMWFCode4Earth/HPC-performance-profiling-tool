@@ -1,0 +1,18 @@
+{
+    "array": [
+        {
+            "componentName" : "Sun Burst graph",
+            "componentLocation" : "componentsToRender/sunburst.html",
+            "comment" : "componentLocation is deprecated",
+            "componentImage" : "sunBurst.png",
+            "typeHTML" : "false"
+        },
+        {
+            "componentName" : "Radar graph",
+            "componentLocation" : "componentsToRender/radar_plot.png",
+            "comment" : "componentLocation is deprecated",
+            "componentImage" : "radarPlot.png",
+            "typeHTML" : "false"
+        }
+    ]
+}
