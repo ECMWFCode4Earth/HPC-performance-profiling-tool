@@ -2,7 +2,7 @@
     "array": [
         {
             "componentName" : "Sun Burst graph",
-            "componentLocation" : "componentsToRender/sunburst.html",
+            "componentLocation" : "componentsToRender/sunburst.json",
             "comment" : "componentLocation is deprecated",
             "componentImage" : "sunBurst.png",
             "typeHTML" : "false"
