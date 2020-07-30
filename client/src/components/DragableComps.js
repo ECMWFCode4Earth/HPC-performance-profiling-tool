@@ -1,8 +1,6 @@
 import React from 'react'
 import './styles.css';
 export function DragableComps({ componentName, componentLocation, componentCallback, componentImage }) {
-
-    console.log(componentImage)
     return (
         <div className="card-1" style={{
             backgroundColor: "0xfffffff",

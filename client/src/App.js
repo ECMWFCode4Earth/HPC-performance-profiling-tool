@@ -9,7 +9,7 @@ export default function App() {
   };
 
   const [dragableObjects, setDragableObjects] = useState([])
-  console.log(dragableObjects);
+
   return (
     <div style={{ display: "flex" }}>
       <div style={{
@@ -38,7 +38,7 @@ export default function App() {
         }
       </div>
       <div style={{ ...parentBoundary, height: "97vh", margin: "20px" }}>
-        {dragableObjects.map((e, idx) => <ResizableComponent key={idx} componentLocation={e} />)}
+        {dragableObjects.map((e, idx) => <ResizableComponent key={idx} componentLocation={e}/>)}
       </div>
     </div>
   );

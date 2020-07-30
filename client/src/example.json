@@ -2,17 +2,16 @@
     "array": [
         {
             "componentName" : "Sun Burst graph",
-            "componentLocation" : "componentsToRender/sunburst.json",
-            "comment" : "componentLocation is deprecated",
+            "componentLocation" : "http://0.0.0.0:8080/getSunburstController",
             "componentImage" : "sunBurst.png",
-            "typeHTML" : "false"
+            "type" : "json"
         },
         {
             "componentName" : "Radar graph",
             "componentLocation" : "componentsToRender/radar_plot.png",
             "comment" : "componentLocation is deprecated",
             "componentImage" : "radarPlot.png",
-            "typeHTML" : "false"
+            "type" : "img"
         }
     ]
 }
