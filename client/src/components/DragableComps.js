@@ -1,6 +1,6 @@
 import React from 'react'
 import './styles.css';
-export function DragableComps({ componentName, componentLocation, componentCallback, componentImage }) {
+export function DragableComps({ componentName, componentLocation, componentCallback, componentImage, modalShow, setModalShow }) {
     return (
         <div className="card-1" style={{
             backgroundColor: "0xfffffff",
@@ -12,7 +12,7 @@ export function DragableComps({ componentName, componentLocation, componentCallb
             alignItems: 'center'
         }}
             // this action should come from the network but here we are prerandering some examples
-            onClick={() => componentCallback(componentLocation)}>
+            onClick={() => setModalShow(true) && componentCallback(componentLocation)}>
             <div style={{
                 position: 'relative',
                 maxWidth: '60px',
