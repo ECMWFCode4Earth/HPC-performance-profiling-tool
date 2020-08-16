@@ -1,19 +1,11 @@
 import React, { useState } from "react";
 import { DragableComps } from './components/DragableComps';
 import jsonExample from "./example.json";
-import ResizableComponent from './components/ResizableComponent.js'
-import { Modal } from './components';
 
 export default function App() {
-  const parentBoundary = {
-    width: "100%",
-  };
-
   const [dragableObjects, setDragableObjects] = useState([])
-  const [modalShow, setModalShow] = useState(false);
   return (
     <div>
-      <Modal data={[1, 2]} show={modalShow} setModalShow={setModalShow}/>
       <div style={{ display: "flex" }}>
         <div style={{
           width: "300px",
@@ -34,17 +26,15 @@ export default function App() {
               key={idx}
               componentName={e.componentName}
               componentLocation={e.componentLocation}
-              modalShow={modalShow}
-              setModalShow={setModalShow}
               componentCallback={(name) => setDragableObjects([...dragableObjects, name])}
               componentImage={e.componentImage}
             />
             )
           }
         </div>
-        <div style={{ ...parentBoundary, height: "97vh", margin: "20px" }}>
+        {/* <div style={{ ...parentBoundary, height: "97vh", margin: "20px" }}>
           {dragableObjects.map((e, idx) => <ResizableComponent key={idx} componentLocation={e} />)}
-        </div>
+        </div> */}
       </div>
     </div>
   );
