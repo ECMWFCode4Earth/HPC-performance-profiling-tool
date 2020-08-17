@@ -2,14 +2,24 @@ import React, { useState, useEffect } from "react";
 import { DragableComps } from './components/DragableComps';
 import jsonExample from "./example.json";
 import ReactFlow, { addEdge } from 'react-flow-renderer';
-import Plot from 'react-plotly.js';
-
+import CustomComponent from './components/CustomComponent';
+const nodeTypes = {
+  selectorNode: CustomComponent,
+  agregatorNode: CustomComponent 
+};
 
 const initialElements = [
   {
     id: '0',
     data: { label: 'Node 1' },
     position: { x: 250, y: 5 }
+  },
+  {
+    id: '2',
+    type: 'selectorNode',
+    data: { onChange: () => 'aa', color: 'red' },
+    style: { border: '1px solid #777', padding: 10 },
+    position: { x: 250, y: 50 },
   },
 ];
 
@@ -19,6 +29,13 @@ const initialElements = [
 // trebuie sa ma uit cum fac event de double click sau imi fac eu niste event uri acolo
 // trebuie sa imi fac o functie de delete
 // React flow get status
+// trebuie sa ma uit cum fac event de double click sau imi fac eu niste event uri acolo
+// trebuie sa imi fac o functie de delete
+// React flow get status
+// get on connect source and target and like so we know if input or output node
+// the links disapear when you add new element
+// delete possibility for the nodes
+// connect to the server
 
 const graphStyles = { width: '100vw', height: '100vh', maringLeft: '200px' };
 
@@ -45,7 +62,9 @@ const BasicGraph = ({ elements, setElements }) => {
     onConnect={onConnect}
     nodesConnectable={true}
     elements={elements}
-    style={graphStyles} />;
+    style={graphStyles}
+    nodeTypes={nodeTypes}
+    />;
 
 }
 
@@ -97,7 +116,7 @@ export default function App() {
         </div>
         <BasicGraph elements={elements} setElements={setElements} />
         {/* <div style={{ ...parentBoundary, height: "97vh", margin: "20px" }}>
-          {dragableObjects.map((e, idx) => <ResizableComponent key={idx} componentLocation={e} />)}
+          {dragableObjects.map((e, idx) => <   key={idx} componentLocation={e} />)}
         </div> */}
       </div>
     </div>
