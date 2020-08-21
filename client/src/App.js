@@ -32,60 +32,95 @@ const initialElements = [
   },
 ];
 
-// add remove
-// trebuie sa ma uit cum fac event de double click sau imi fac eu niste event uri acolo
-// React flow get status
-// get on connect source and target and like so we know if input or output node
 // the links disapear when you add new element
-// delete possibility for the nodes
 // connect to the server
-// investigate nodes horizontal
-// add delete button
-// link rules add
+// link rules add - check if input node or not
+
 
 const graphStyles = { width: '100vw', height: '100vh', maringLeft: '200px' };
 
 const BasicGraph = ({ elements, setElements }) => {
-  // get on connect source and target and like so we know if input or output node
-  const onConnect = (params) => setElements((els) => {
-    const edge = { ...params, id: 'HPC_LINK_' + params.source + params.target + '_' + (Math.random() * 100), type: 'custom', className: 'HPC_LINK' };
-    console.log(els);
+  const [selected, setSelected] = useState([]);
 
+  useEffect(() => {
+
+    const removeEls = (myArray, toRemove) => {
+      for (let i = myArray.length - 1; i >= 0; i--) {
+        for (let j = 0; j < toRemove.length; j++) {
+          if (('' + myArray[i]?.source).startsWith('' + toRemove[j].id) || (myArray[i]?.target + '').startsWith('' + toRemove[j].id)) {
+            myArray.splice(i, 1);
+          }
+        }
+      }
+
+      for (let i = myArray.length - 1; i >= 0; i--) {
+        for (let j = 0; j < toRemove.length; j++) {
+
+          if (myArray[i] && (myArray[i].id === toRemove[j].id)) {
+            myArray.splice(i, 1);
+          }
+        }
+      }
+      return myArray;
+    }
+
+    document.onkeypress = function (evt) {
+      evt = evt || window.event;
+      var charCode = evt.keyCode || evt.which;
+      if (charCode === 127) {
+        let elsCopy = [...elements];
+        setElements((removeEls(elsCopy, selected)));
+      }
+    };
+  }, [selected, setElements, elements])
+
+  const onConnect = (params) => setElements((els) => {
+    const edge = {
+      ...params,
+      id: 'HPC_LINK_' + params.source + params.target + '_' + (Math.random() * 100),
+      type: 'custom',
+      className: 'HPC_LINK'
+    };
     // check if not already linked
+    console.log(elements)
     return [...els, edge]
   });
 
-  const removeEl = (el) => {
-    // create get connected edges
-    // remove the link as well
-    return elements;
-    // return elements.filter(e => e.id !== el.id);
-
-  }
-  useEffect(() => {
-    console.log(elements);
-  }, [elements])
-  return <ReactFlow
-    onElementClick={(event, el) => { setElements(removeEl(el)); }}
-    onConnect={onConnect}
-    nodesConnectable={true}
-    elements={elements}
-    style={graphStyles}
-    nodeTypes={nodeTypes}
-    edgeTypes={edgeTypes}
-    connectionLineStyle={{ strokeWidth: '5px', stroke: '#3289a8' }}
-  >
-    <MiniMap
-      nodeColor={(node) => {
-        switch (node.type) {
-          case 'input': return 'red';
-          case 'default': return '#00ff00';
-          case 'output': return 'rgb(0,0,255)';
-          default: return '#eee';
+  return (
+    <ReactFlow
+      onConnect={onConnect}
+      nodesConnectable={true}
+      elements={elements}
+      style={graphStyles}
+      onKeyPress={
+        (e) => console.log(e)
+      }
+      onSelectionChange={e => {
+        console.log(e);
+        if (e?.length > 0) {
+          setSelected(e);
+          console.log(e)
         }
-      }}
-    />
-  </ReactFlow>;
+      }
+      }
+      zoomOnScroll={true}
+      elementsSelectable={true}
+      nodeTypes={nodeTypes}
+      edgeTypes={edgeTypes}
+      connectionLineStyle={{ strokeWidth: '5px', stroke: '#3289a8' }}
+    >
+      <MiniMap
+        nodeColor={(node) => {
+          switch (node.type) {
+            case 'input': return 'red';
+            case 'default': return '#00ff00';
+            case 'output': return 'rgb(0,0,255)';
+            default: return '#eee';
+          }
+        }}
+      />
+    </ReactFlow>
+  );
 
 }
 
@@ -93,6 +128,7 @@ const BasicGraph = ({ elements, setElements }) => {
 export default function App() {
   const [dragableObjects, setDragableObjects] = useState([]);
   const [elements, setElements] = useState(initialElements);
+
   useEffect(() => {
     let newElem = [];
     dragableObjects.forEach((e, idx) => {
@@ -108,7 +144,7 @@ export default function App() {
     console.log(dragableObjects);
   }, [dragableObjects])
   return (
-    <div>
+    <div onKeyPress={e => console.log(e)}>
       <button onClick={() => {
         [...document.getElementsByClassName('HPC_LINK')].map(e => console.log(e.childNodes[0].id));
         // get the id for each of the links; that use it to map the tree
@@ -140,9 +176,6 @@ export default function App() {
           }
         </div>
         <BasicGraph elements={elements} setElements={setElements} />
-        {/* <div style={{ ...parentBoundary, height: "97vh", margin: "20px" }}>
-          {dragableObjects.map((e, idx) => <   key={idx} componentLocation={e} />)}
-        </div> */}
       </div>
     </div>
   );
