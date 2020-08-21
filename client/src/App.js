@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { DragableComps } from './components/DragableComps';
+import { SidebarMenu } from './components/SidebarMenu';
 import jsonExample from "./example.json";
 import ReactFlow, { MiniMap } from 'react-flow-renderer';
 import CustomComponent from './components/CustomComponent';
@@ -43,7 +43,6 @@ const BasicGraph = ({ elements, setElements }) => {
   const [selected, setSelected] = useState([]);
 
   useEffect(() => {
-
     const removeEls = (myArray, toRemove) => {
       for (let i = myArray.length - 1; i >= 0; i--) {
         for (let j = 0; j < toRemove.length; j++) {
@@ -63,7 +62,6 @@ const BasicGraph = ({ elements, setElements }) => {
       }
       return myArray;
     }
-
     document.onkeypress = function (evt) {
       evt = evt || window.event;
       var charCode = evt.keyCode || evt.which;
@@ -81,8 +79,6 @@ const BasicGraph = ({ elements, setElements }) => {
       type: 'custom',
       className: 'HPC_LINK'
     };
-    // check if not already linked
-    console.log(elements)
     return [...els, edge]
   });
 
@@ -128,27 +124,26 @@ const BasicGraph = ({ elements, setElements }) => {
 export default function App() {
   const [dragableObjects, setDragableObjects] = useState([]);
   const [elements, setElements] = useState(initialElements);
+  const getLinks = (elements) => {
+    return elements?.filter(e => e.target);
+  }
 
   useEffect(() => {
-    let newElem = [];
-    dragableObjects.forEach((e, idx) => {
-      newElem.push(
-        {
-          id: '' + (idx + 1),
-          data: { label: e },
-          position: { x: 250, y: 100 }
-        })
-    })
-    console.log(newElem);
-    setElements([...initialElements, ...newElem]);
-    console.log(dragableObjects);
+    if (!dragableObjects.length)
+      return
+    let newElem = {
+      id: '' + ((Math.random() * 1000) % 1000),
+      data: { label: dragableObjects },
+      position: { x: ((Math.random() * 500) % 500), y: ((Math.random() * 500) % 500) }
+    };
+    setElements(els => [...els, newElem]);
   }, [dragableObjects])
   return (
     <div onKeyPress={e => console.log(e)}>
       <button onClick={() => {
-        [...document.getElementsByClassName('HPC_LINK')].map(e => console.log(e.childNodes[0].id));
-        // get the id for each of the links; that use it to map the tree
-      }}> aaa</button>
+        // get the links
+        console.log(getLinks(elements));
+      }}> Get the links to the console </button>
       <div style={{ display: "flex" }}>
         <div style={{
           width: "300px",
@@ -165,11 +160,11 @@ export default function App() {
           </p>
           </div>
           {
-            jsonExample.array.map((e, idx) => <DragableComps
+            jsonExample.array.map((e, idx) => <SidebarMenu
               key={idx}
               componentName={e.componentName}
               componentLocation={e.componentLocation}
-              componentCallback={(name) => setDragableObjects([...dragableObjects, name])}
+              componentCallback={(name) => setDragableObjects(name)}
               componentImage={e.componentImage}
             />
             )

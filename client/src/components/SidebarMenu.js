@@ -1,6 +1,6 @@
 import React from 'react'
 import './styles.css';
-export function DragableComps(
+export function SidebarMenu(
     {
         componentName,
         componentLocation,
@@ -18,7 +18,6 @@ export function DragableComps(
             alignContent: 'center',
             alignItems: 'center'
         }}
-            // this action should come from the network but here we are randering some examples
             onClick={() => componentCallback(componentLocation)}>
             <div style={{
                 position: 'relative',
