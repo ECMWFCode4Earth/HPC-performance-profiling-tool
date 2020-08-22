@@ -1,6 +1,6 @@
 import React from 'react'
 
-export function Sidebar() {
+export const index = () => {
     return (
         <div>
             

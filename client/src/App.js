@@ -1,9 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { SidebarMenu } from './components/SidebarMenu';
 import jsonExample from "./example.json";
 import ReactFlow, { MiniMap } from 'react-flow-renderer';
-import CustomComponent from './components/CustomComponent';
-import CustomEdge from './components/CustomEdge';
+import {
+  SidebarMenu,
+  CustomComponent,
+  CustomEdge,
+  Filter,
+  Selector,
+  DataSource,
+  DataDisplay
+} from './components/';
 
 const nodeTypes = {
   selectorNode: CustomComponent,
@@ -19,7 +25,7 @@ const initialElements = [
   {
     id: '1',
     type: 'selectorNode',
-    data: { onChange: () => 'aa', color: 'red' },
+    data: { children: <DataSource/> },
     style: { border: '1px solid #777' },
     position: { x: 250, y: 50 },
   },
@@ -35,9 +41,15 @@ const initialElements = [
 // the links disapear when you add new element
 // connect to the server
 // link rules add - check if input node or not
+// bad style to keep this components here
+// change the way that the links work with validation
 
 
-const graphStyles = { width: '100vw', height: '100vh', maringLeft: '200px' };
+const graphStyles = {
+  width: '100vw',
+  height: '100vh',
+  maringLeft: '200px'
+};
 
 const BasicGraph = ({ elements, setElements }) => {
   const [selected, setSelected] = useState([]);
