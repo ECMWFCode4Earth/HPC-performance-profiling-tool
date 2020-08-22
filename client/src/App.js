@@ -8,11 +8,12 @@ import {
   Filter,
   Selector,
   DataSource,
+  OutputNode,
   DataDisplay
 } from './components/';
 
 const nodeTypes = {
-  selectorNode: CustomComponent,
+  customNode: CustomComponent,
   agregatorNode: CustomComponent
 };
 
@@ -21,28 +22,14 @@ const edgeTypes = {
 };
 
 
-const initialElements = [
-  {
-    id: '1',
-    type: 'selectorNode',
-    data: { children: <DataSource/> },
-    style: { border: '1px solid #777' },
-    position: { x: 250, y: 50 },
-  },
-  {
-    id: '2',
-    type: 'selectorNode',
-    data: { onChange: () => 'aa', color: 'red' },
-    style: { border: '1px solid #777' },
-    position: { x: 450, y: 50 },
-  },
-];
+
 
 // the links disapear when you add new element
 // connect to the server
 // link rules add - check if input node or not
 // bad style to keep this components here
 // change the way that the links work with validation
+// add all this components to the sidebar
 
 
 const graphStyles = {
@@ -132,13 +119,35 @@ const BasicGraph = ({ elements, setElements }) => {
 
 }
 
+const getLinks = (elements) => {
+  return elements?.filter(e => e.target);
+}
+
+
+const initialElements = [
+  {
+    id: '1',
+    type: 'customNode',
+    data: { children: <DataSource /> },
+    style: { border: '1px solid #777' },
+    position: { x: 250, y: 50 },
+  },
+  {
+    id: '2',
+    type: 'customNode',
+    data: { children: <OutputNode /> },
+    style: { border: '1px solid #777' },
+    position: { x: 450, y: 50 },
+  },
+];
 
 export default function App() {
+
+
+  const [index, setIndex] = useState(1);
   const [dragableObjects, setDragableObjects] = useState([]);
   const [elements, setElements] = useState(initialElements);
-  const getLinks = (elements) => {
-    return elements?.filter(e => e.target);
-  }
+
 
   useEffect(() => {
     if (!dragableObjects.length)
@@ -149,7 +158,8 @@ export default function App() {
       position: { x: ((Math.random() * 500) % 500), y: ((Math.random() * 500) % 500) }
     };
     setElements(els => [...els, newElem]);
-  }, [dragableObjects])
+  }, [dragableObjects]);
+
   return (
     <div onKeyPress={e => console.log(e)}>
       <button onClick={() => {
