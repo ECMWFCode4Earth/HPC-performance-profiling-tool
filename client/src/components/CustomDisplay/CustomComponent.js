@@ -5,7 +5,7 @@ import { Handle } from 'react-flow-renderer';
 export default memo(({ data }) => {
     return (
         <div style={{ backgroundColor: 'white' }}>
-            <Handle type="source"
+            {data.type !== 'TOnode' && <Handle type="source"
                 position="bottom"
                 id={'src' + data.type}
                 style={{
@@ -17,8 +17,9 @@ export default memo(({ data }) => {
                 // isConnectable / isValidConnection
                 onConnect={(params) => console.log(params)}
             />
+            }
             {data.children}
-          { data.type !== 'Dsource' && <Handle type="target"
+            {data.type !== 'Dsource' && <Handle type="target"
                 position="top"
                 id={'target' + data.type}
                 style={{

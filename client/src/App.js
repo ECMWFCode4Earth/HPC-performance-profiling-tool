@@ -140,7 +140,7 @@ const initialElements = [
     position: { x: 250, y: 50 },
   },
   {
-    id: '2',
+    id: '5',
     type: 'customNode',
     data: {
       children: <OutputNode type='text' url={{
@@ -158,10 +158,10 @@ const initialElements = [
     position: { x: 450, y: 50 },
   },
   {
-    id: '3',
+    id: '4',
     type: 'customNode',
     data: {
-      children: <OutputNode type='dispaly' url={'url'} />, type: 'Onode'
+      children: <OutputNode type='dispaly' url={'url'} />, type: 'TOnode'
     },
     style: { border: '1px solid #777' },
     position: { x: 450, y: 50 },

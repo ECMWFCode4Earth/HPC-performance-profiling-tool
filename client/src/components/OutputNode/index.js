@@ -4,7 +4,7 @@ import { DataDisplay } from '../';
 export const OutputNode = ({url, type }) => {
     console.log(url);
     // fetch data from the server
-    data = url;
+    let data = url;
     return (
         <div>
             {type === 'text' ? <pre>
