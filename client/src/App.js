@@ -11,6 +11,8 @@ import {
   OutputNode,
   DataDisplay
 } from './components/';
+import { getFlows } from './utils';
+import axios from 'axios';
 
 const nodeTypes = {
   customNode: CustomComponent,
@@ -24,12 +26,10 @@ const edgeTypes = {
 
 
 
-// the links disapear when you add new element
-// connect to the server
-// link rules add - check if input node or not
-// bad style to keep this components here
-// change the way that the links work with validation
-// add all this components to the sidebar
+// TODO: connect to the server
+// TODO: link rules add - check if input node or not
+// TODO: bad style to keep this components here
+// TODO: add all this components to the sidebar
 
 
 const graphStyles = {
@@ -128,22 +128,47 @@ const initialElements = [
   {
     id: '1',
     type: 'customNode',
-    data: { children: <DataSource /> },
+    data: { children: <DataSource />, type: 'Dsource' },
+    style: { border: '1px solid #777' },
+    position: { x: 250, y: 50 },
+  },
+  {
+    id: '3',
+    type: 'customNode',
+    data: { children: <DataSource />, type: 'Dsource' },
     style: { border: '1px solid #777' },
     position: { x: 250, y: 50 },
   },
   {
     id: '2',
     type: 'customNode',
-    data: { children: <OutputNode /> },
+    data: {
+      children: <OutputNode type='text' url={{
+        "data": {
+          "x": "1",
+          "y": "1",
+          "url": "http://url.com"
+        },
+        "event": "start",
+        "show": 1,
+        "id": 50
+      }} />, type: 'Onode'
+    },
+    style: { border: '1px solid #777' },
+    position: { x: 450, y: 50 },
+  },
+  {
+    id: '3',
+    type: 'customNode',
+    data: {
+      children: <OutputNode type='dispaly' url={'url'} />, type: 'Onode'
+    },
     style: { border: '1px solid #777' },
     position: { x: 450, y: 50 },
   },
 ];
 
 export default function App() {
-
-
   const [index, setIndex] = useState(1);
   const [dragableObjects, setDragableObjects] = useState([]);
   const [elements, setElements] = useState(initialElements);
@@ -165,7 +190,11 @@ export default function App() {
       <button onClick={() => {
         // get the links
         console.log(getLinks(elements));
+        console.log(getFlows(getLinks(elements)));
       }}> Get the links to the console </button>
+      <button onClick={() => {
+        console.log(elements)
+      }}> get to server </button>
       <div style={{ display: "flex" }}>
         <div style={{
           width: "300px",

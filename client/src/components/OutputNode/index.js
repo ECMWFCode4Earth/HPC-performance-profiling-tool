@@ -1,23 +1,16 @@
-import React from 'react'
+import React from 'react';
+import { DataDisplay } from '../';
 
-export const OutputNode = ({ data = { 'data': '123', 'dats2': '124321' } }) => {
-    var data = {
-        "data": {
-            "x": "1",
-            "y": "1",
-            "url": "http://url.com"
-        },
-        "event": "start",
-        "show": 1,
-        "id": 50
-    };
-    console.log(data);
-
+export const OutputNode = ({url, type }) => {
+    console.log(url);
+    // fetch data from the server
+    data = url;
     return (
         <div>
-            <pre>
+            {type === 'text' ? <pre>
                 {JSON.stringify(data, undefined, 2)}
-            </pre>
+            </pre> : <DataDisplay data={data}/>
+            }
         </div>
     );
 

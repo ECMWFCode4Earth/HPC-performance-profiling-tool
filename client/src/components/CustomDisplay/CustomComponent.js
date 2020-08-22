@@ -2,13 +2,12 @@ import React, { memo } from 'react';
 
 import { Handle } from 'react-flow-renderer';
 
-export default memo(({ data, idx, selector }) => {
+export default memo(({ data }) => {
     return (
         <div style={{ backgroundColor: 'white' }}>
-
             <Handle type="source"
-                position="top"
-                id='source'
+                position="bottom"
+                id={'src' + data.type}
                 style={{
                     background: 'red',
                     borderRadius: '70px',
@@ -19,9 +18,9 @@ export default memo(({ data, idx, selector }) => {
                 onConnect={(params) => console.log(params)}
             />
             {data.children}
-            <Handle type="target"
-                position="bottom"
-                id='target'
+          { data.type !== 'Dsource' && <Handle type="target"
+                position="top"
+                id={'target' + data.type}
                 style={{
                     background: 'blue',
                     borderRadius: '70px',
@@ -29,7 +28,7 @@ export default memo(({ data, idx, selector }) => {
                     height: '10px'
                 }}
                 onConnect={(params) => console.log(params)}
-            />
+            />}
         </div>
     );
 });

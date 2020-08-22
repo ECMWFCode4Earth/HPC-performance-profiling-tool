@@ -1,7 +1,8 @@
 import React from 'react'
 import Plot from 'react-plotly.js';
 
-export const DataDisplay = () => {
+export const DataDisplay = ({data}) => {
+    // the data contains the data and the layout data
     return (
         <div style={{ backgroundColor: 'white' }}>
             <Plot

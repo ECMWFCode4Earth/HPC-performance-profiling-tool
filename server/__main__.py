@@ -10,7 +10,8 @@ CORS(app)
 
 @app.route('/')
 def index():
-    print("aa")
+    content = request.get_json()
+    print(content)
     return 'Index Page'
 
 @app.route('/hello')
