@@ -26,10 +26,12 @@ const edgeTypes = {
 
 
 
-// TODO: connect to the server
+// TODO: solve the sever connection
 // TODO: link rules add - check if input node or not
-// TODO: bad style to keep this components here
 // TODO: add all this components to the sidebar
+// TODO: add selector with the graph from plotly
+// TODO: get the state of the lines
+// TODO: add deletion of the lines
 
 
 const graphStyles = {
@@ -87,17 +89,10 @@ const BasicGraph = ({ elements, setElements }) => {
       nodesConnectable={true}
       elements={elements}
       style={graphStyles}
-      onKeyPress={
-        (e) => console.log(e)
-      }
       onSelectionChange={e => {
-        console.log(e);
-        if (e?.length > 0) {
+        if (e?.length > 0)
           setSelected(e);
-          console.log(e)
-        }
-      }
-      }
+      }}
       zoomOnScroll={true}
       elementsSelectable={true}
       nodeTypes={nodeTypes}
@@ -123,27 +118,33 @@ const getLinks = (elements) => {
   return elements?.filter(e => e.target);
 }
 
+const getNodes = (elements) => {
+  return elements?.filter(e => e.data);
+}
 
 const initialElements = [
   {
     id: '1',
     type: 'customNode',
-    data: { children: <DataSource />, type: 'Dsource' },
+    data: { children: () => <DataSource />, type: 'Dsource' },
     style: { border: '1px solid #777' },
     position: { x: 250, y: 50 },
+  },
+  {
+    id: '2',
+    type: 'customNode',
+    data: {
+      children: (props) => <DataSource/>
+      , type: 'Dsource'
+    },
+    style: { border: '1px solid #777' },
+    position: { x: 280, y: 500 },
   },
   {
     id: '3',
     type: 'customNode',
-    data: { children: <DataSource />, type: 'Dsource' },
-    style: { border: '1px solid #777' },
-    position: { x: 250, y: 50 },
-  },
-  {
-    id: '5',
-    type: 'customNode',
     data: {
-      children: <OutputNode type='text' url={{
+      children: (props) => <OutputNode props={props} type='text' url={{
         "data": {
           "x": "1",
           "y": "1",
@@ -151,25 +152,34 @@ const initialElements = [
         },
         "event": "start",
         "show": 1,
-        "id": 50
-      }} />, type: 'Onode'
+      }} />
+      , type: 'Onode'
     },
     style: { border: '1px solid #777' },
-    position: { x: 450, y: 50 },
+    position: { x: 280, y: 500 },
   },
   {
     id: '4',
     type: 'customNode',
     data: {
-      children: <OutputNode type='dispaly' url={'url'} />, type: 'TOnode'
+      children: (props) => <OutputNode props={props} type='text' url={{
+        "data": {
+          "x": "1",
+          "y": "1",
+          "url": "http://url.com"
+        },
+        "event": "start",
+        "show": 1,
+      }} />
+      , type: 'Onode'
     },
     style: { border: '1px solid #777' },
-    position: { x: 450, y: 50 },
+    position: { x: 280, y: 500 },
   },
+
 ];
 
 export default function App() {
-  const [index, setIndex] = useState(1);
   const [dragableObjects, setDragableObjects] = useState([]);
   const [elements, setElements] = useState(initialElements);
 
@@ -186,15 +196,10 @@ export default function App() {
   }, [dragableObjects]);
 
   return (
-    <div onKeyPress={e => console.log(e)}>
+    <div>
       <button onClick={() => {
-        // get the links
-        console.log(getLinks(elements));
-        console.log(getFlows(getLinks(elements)));
+        console.log(getFlows(getLinks(elements), getNodes(elements)));
       }}> Get the links to the console </button>
-      <button onClick={() => {
-        console.log(elements)
-      }}> get to server </button>
       <div style={{ display: "flex" }}>
         <div style={{
           width: "300px",

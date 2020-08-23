@@ -2,7 +2,7 @@ import React, { memo } from 'react';
 
 import { Handle } from 'react-flow-renderer';
 
-export default memo(({ data }) => {
+export default memo(({data, id}) => {
     return (
         <div style={{ backgroundColor: 'white' }}>
             {data.type !== 'TOnode' && <Handle type="source"
@@ -15,10 +15,13 @@ export default memo(({ data }) => {
                     height: '10px'
                 }}
                 // isConnectable / isValidConnection
+                // check not to conenct multiple; not to connect 2 sources
+                // check to connect just to the end
+                // I am not checking for cycles
                 onConnect={(params) => console.log(params)}
             />
             }
-            {data.children}
+            {data.children({data, id})}
             {data.type !== 'Dsource' && <Handle type="target"
                 position="top"
                 id={'target' + data.type}
