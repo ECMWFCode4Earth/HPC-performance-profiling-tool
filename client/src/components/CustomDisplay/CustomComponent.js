@@ -14,10 +14,10 @@ export default memo(({data, id}) => {
                     width: '10px',
                     height: '10px'
                 }}
-                // isConnectable / isValidConnection
-                // check not to conenct multiple; not to connect 2 sources
-                // check to connect just to the end
-                // I am not checking for cycles
+                // TODO isConnectable / isValidConnection
+                // TODO check not to conenct multiple; not to connect 2 sources
+                // TODO check to connect just to the end
+                // TODO I am not checking for cycles
                 onConnect={(params) => console.log(params)}
             />
             }

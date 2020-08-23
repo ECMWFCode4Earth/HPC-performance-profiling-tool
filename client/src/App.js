@@ -31,7 +31,6 @@ const edgeTypes = {
 // TODO: add all this components to the sidebar
 // TODO: add selector with the graph from plotly
 // TODO: get the state of the lines
-// TODO: add deletion of the lines
 
 
 const graphStyles = {
@@ -83,7 +82,7 @@ const BasicGraph = ({ elements, setElements }) => {
       };
       return [...els, edge]
     });
-    // call the dfs function; set the new ends
+    // TODO call the dfs function; set the new ends
   }
 
   return (
@@ -96,6 +95,7 @@ const BasicGraph = ({ elements, setElements }) => {
         if (e?.length > 0)
           setSelected(e);
       }}
+      onSelect={e => console.log(e)}
       zoomOnScroll={true}
       elementsSelectable={true}
       nodeTypes={nodeTypes}
