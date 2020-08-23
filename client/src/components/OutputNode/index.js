@@ -6,8 +6,10 @@ export const OutputNode = (data) => {
     let type = data.type;
     let url = data.url;
     let id = data.props.id;
-    console.log(url)
-    console.log(id)
+    console.log(url);
+    console.log(id);
+
+    // TODO check the state and if we are connected to something; fetch data
     return (
         <div>
             {type === 'text' ? <pre>

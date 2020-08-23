@@ -73,15 +73,18 @@ const BasicGraph = ({ elements, setElements }) => {
     };
   }, [selected, setElements, elements])
 
-  const onConnect = (params) => setElements((els) => {
-    const edge = {
-      ...params,
-      id: 'HPC_LINK_' + params.source + params.target + '_' + (Math.random() * 100),
-      type: 'custom',
-      className: 'HPC_LINK'
-    };
-    return [...els, edge]
-  });
+  const onConnect = (params) => {
+    setElements((els) => {
+      const edge = {
+        ...params,
+        id: 'HPC_LINK_' + params.source + params.target + '_' + (Math.random() * 100),
+        type: 'custom',
+        className: 'HPC_LINK'
+      };
+      return [...els, edge]
+    });
+    // call the dfs function; set the new ends
+  }
 
   return (
     <ReactFlow
@@ -134,7 +137,7 @@ const initialElements = [
     id: '2',
     type: 'customNode',
     data: {
-      children: (props) => <DataSource/>
+      children: (props) => <DataSource />
       , type: 'Dsource'
     },
     style: { border: '1px solid #777' },
@@ -180,14 +183,15 @@ const initialElements = [
 ];
 
 export default function App() {
+  const [initialID, setInitialID] = useState(1);
   const [dragableObjects, setDragableObjects] = useState([]);
   const [elements, setElements] = useState(initialElements);
-
 
   useEffect(() => {
     if (!dragableObjects.length)
       return
     let newElem = {
+      // TODO do not calculate id like this
       id: '' + ((Math.random() * 1000) % 1000),
       data: { label: dragableObjects },
       position: { x: ((Math.random() * 500) % 500), y: ((Math.random() * 500) % 500) }
