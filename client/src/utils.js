@@ -12,6 +12,7 @@ export const getFlows = (links, nodes) => {
     links.map(e => {
         if (e.source.endsWith('Dsource'))
             dataSources.push(e.source.replace(/_.*/gi, ''));
+        return null;
     });
 
     dataSources.map(s => {
@@ -26,6 +27,7 @@ export const getFlows = (links, nodes) => {
             chain: longest_chain,
             flows: chains
         }
+        return null;
     });
 
     return flow;
@@ -44,7 +46,7 @@ const dfs = (source, stack, graph, graphParents) => {
     graphParents[source] = [...stack];
 
     for (let i = 0; i < graph.length; i++) {
-        if (graph[i].src == source)
+        if (graph[i].src === source)
             dfs(graph[i].dst, stack, graph, graphParents);
     }
     return graphParents;

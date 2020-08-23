@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from "react";
-import jsonExample from "./example.json";
 import ReactFlow, { MiniMap } from 'react-flow-renderer';
+// import axios from 'axios';
+import jsonExample from "./example.json";
 import {
   SidebarMenu,
   CustomComponent,
   CustomEdge,
-  Filter,
-  Selector,
+  // Filter,
+  // Selector,
   DataSource,
   OutputNode,
-  DataDisplay
+  // DataDisplay
 } from './components/';
 import { getFlows } from './utils';
-import axios from 'axios';
 
 const nodeTypes = {
   customNode: CustomComponent,
@@ -183,7 +183,7 @@ const initialElements = [
 ];
 
 export default function App() {
-  const [initialID, setInitialID] = useState(1);
+  // const [initialID, setInitialID] = useState(1);
   const [dragableObjects, setDragableObjects] = useState([]);
   const [elements, setElements] = useState(initialElements);
 
