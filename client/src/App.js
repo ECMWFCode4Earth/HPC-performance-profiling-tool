@@ -14,7 +14,7 @@ import {
   // DataDisplay
 } from './components/';
 import { getFlows } from './utils';
-import { updateAction } from './store';
+import { updateAction, addElementsAction } from './store';
 
 const nodeTypes = {
   customNode: CustomComponent,
@@ -43,6 +43,7 @@ const graphStyles = {
 
 const BasicGraph = ({ elements, setElements }) => {
   const [selected, setSelected] = useState([]);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const removeEls = (myArray, toRemove) => {
@@ -69,6 +70,7 @@ const BasicGraph = ({ elements, setElements }) => {
       if (charCode === 127) {
         let elsCopy = [...elements];
         setElements((removeEls(elsCopy, selected)));
+        dispatch(addElementsAction(removeEls(elsCopy, selected)));
       }
     };
   }, [selected, setElements, elements])
@@ -81,6 +83,8 @@ const BasicGraph = ({ elements, setElements }) => {
         type: 'custom',
         className: 'HPC_LINK'
       };
+      dispatch(addElementsAction([...els, edge]));
+
       return [...els, edge];
     });
   }
@@ -197,11 +201,10 @@ export default function App() {
       position: { x: ((Math.random() * 500) % 500), y: ((Math.random() * 500) % 500) }
     };
     setElements(els => [...els, newElem]);
+    dispatch(addElementsAction([...elements, newElem]));
   }, [dragableObjects]);
 
   useEffect(() => {
-    console.log(elements);
-    console.log(updateAction(getFlows(getLinks(elements), getNodes(elements))));
     dispatch(updateAction(getFlows(getLinks(elements), getNodes(elements))));
   }, [elements, dispatch]);
 
