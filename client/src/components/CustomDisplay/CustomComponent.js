@@ -1,8 +1,16 @@
 import React, { memo } from 'react';
 
 import { Handle } from 'react-flow-renderer';
+import { useSelector } from 'react-redux';
 
-export default memo(({data, id}) => {
+// BUG you can now connect to yourself
+export default memo(({ data, id }) => {
+    const flow = useSelector(state => state.flow);
+
+    React.useEffect(() => {
+        console.log(flow);
+        console.log(id);
+    }, [flow])
     return (
         <div style={{ backgroundColor: 'white' }}>
             {data.type !== 'TOnode' && <Handle type="source"
@@ -14,14 +22,14 @@ export default memo(({data, id}) => {
                     width: '10px',
                     height: '10px'
                 }}
-                // TODO isConnectable / isValidConnection
-                // TODO check not to conenct multiple; not to connect 2 sources
-                // TODO check to connect just to the end
-                // TODO I am not checking for cycles
-                onConnect={(params) => console.log(params)}
+            // TODO isConnectable / isValidConnection
+            // TODO check not to conenct multiple; not to connect 2 sources
+            // TODO check to connect just to the end
+            // TODO I am not checking for cycles
+            // onConnect={(params) => console.log(params)}
             />
             }
-            {data.children({data, id})}
+            {data.children({ data, id })}
             {data.type !== 'Dsource' && <Handle type="target"
                 position="top"
                 id={'target' + data.type}
@@ -31,7 +39,10 @@ export default memo(({data, id}) => {
                     width: '10px',
                     height: '10px'
                 }}
-                onConnect={(params) => console.log(params)}
+            // TODO check not to conenct multiple; not to connect 2 sources
+            // TODO check to connect just to the end
+            // TODO I am not checking for cycles
+            // onConnect={(params) => console.log(params)}
             />}
         </div>
     );

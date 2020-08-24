@@ -36,9 +36,6 @@ export const getFlows = (links, nodes) => {
 const dfs = (source, stack, graph, graphParents) => {
 
     if (stack.includes(source)) {
-        console.log(stack);
-        console.log(source);
-        console.log('Cycle something is invalid');
         return null;
     }
 

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import ReactFlow, { MiniMap } from 'react-flow-renderer';
+import { useDispatch } from 'react-redux'
 // import axios from 'axios';
 import jsonExample from "./example.json";
 import {
@@ -13,6 +14,7 @@ import {
   // DataDisplay
 } from './components/';
 import { getFlows } from './utils';
+import { updateAction } from './store';
 
 const nodeTypes = {
   customNode: CustomComponent,
@@ -54,7 +56,6 @@ const BasicGraph = ({ elements, setElements }) => {
 
       for (let i = myArray.length - 1; i >= 0; i--) {
         for (let j = 0; j < toRemove.length; j++) {
-
           if (myArray[i] && (myArray[i].id === toRemove[j].id)) {
             myArray.splice(i, 1);
           }
@@ -80,9 +81,8 @@ const BasicGraph = ({ elements, setElements }) => {
         type: 'custom',
         className: 'HPC_LINK'
       };
-      return [...els, edge]
+      return [...els, edge];
     });
-    // TODO call the dfs function; set the new ends
   }
 
   return (
@@ -95,7 +95,6 @@ const BasicGraph = ({ elements, setElements }) => {
         if (e?.length > 0)
           setSelected(e);
       }}
-      onSelect={e => console.log(e)}
       zoomOnScroll={true}
       elementsSelectable={true}
       nodeTypes={nodeTypes}
@@ -186,6 +185,7 @@ export default function App() {
   // const [initialID, setInitialID] = useState(1);
   const [dragableObjects, setDragableObjects] = useState([]);
   const [elements, setElements] = useState(initialElements);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (!dragableObjects.length)
@@ -199,11 +199,14 @@ export default function App() {
     setElements(els => [...els, newElem]);
   }, [dragableObjects]);
 
+  useEffect(() => {
+    console.log(elements);
+    console.log(updateAction(getFlows(getLinks(elements), getNodes(elements))));
+    dispatch(updateAction(getFlows(getLinks(elements), getNodes(elements))));
+  }, [elements, dispatch]);
+
   return (
     <div>
-      <button onClick={() => {
-        console.log(getFlows(getLinks(elements), getNodes(elements)));
-      }}> Get the links to the console </button>
       <div style={{ display: "flex" }}>
         <div style={{
           width: "300px",
