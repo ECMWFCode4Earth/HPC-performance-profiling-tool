@@ -5,6 +5,7 @@ import { combineReducers } from 'redux'
 const initialState = {};
 const TRIGGER_UPDATE = 'TRIGGER_UPDATE';
 const ADD_ELEMENTS = 'ADD_ELEMENTS';
+const ID_MAPPING = 'ID_MAPPING';
 
 
 // Create Id value mapping
@@ -13,11 +14,12 @@ function updateReducer(state = initialState, action) {
   switch (action.type) {
     case TRIGGER_UPDATE:
       return { ...state, flow: action.flow };
-
     default:
       return state;
   }
 }
+
+
 function addReducer(state = initialState, action) {
   switch (action.type) {
     case ADD_ELEMENTS:
@@ -27,24 +29,42 @@ function addReducer(state = initialState, action) {
   }
 }
 
+function idMappingReducer(state = initialState, action) {
+  switch (action.type) {
+    case ID_MAPPING:
+      let newState = state.mapping ?? {};
+      newState[action.mapping.id] = { val: action.mapping.value, type: action.mapping.type };
+      return { ...state, mapping: newState };
+    default:
+      return state;
+  }
+}
+
 
 export const updateAction = (flow) => {
-    return {
-        type: TRIGGER_UPDATE,
-        flow: flow,
-    };
+  return {
+    type: TRIGGER_UPDATE,
+    flow: flow,
+  };
 }
 
 export const addElementsAction = (elements) => {
   return {
-      type: ADD_ELEMENTS,
-      elements: elements,
+    type: ADD_ELEMENTS,
+    elements: elements,
   };
 }
 
+export const mappingElementsAction = (mapping) => {
+  return {
+    type: ID_MAPPING,
+    mapping: mapping,
+  };
+}
 
 export const rootReducer = combineReducers({
   elements: addReducer,
+  mapping: idMappingReducer,
   flow: updateReducer
 });
 

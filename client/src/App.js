@@ -73,7 +73,7 @@ const BasicGraph = ({ elements, setElements }) => {
         dispatch(addElementsAction(removeEls(elsCopy, selected)));
       }
     };
-  }, [selected, setElements, elements])
+  }, [selected, setElements, elements, dispatch])
 
   const onConnect = (params) => {
     setElements((els) => {
@@ -132,17 +132,14 @@ const initialElements = [
   {
     id: '1',
     type: 'customNode',
-    data: { children: () => <DataSource />, type: 'Dsource' },
+    data: { children: (props) => <DataSource {...props} />, type: 'Dsource' },
     style: { border: '1px solid #777' },
     position: { x: 250, y: 50 },
   },
   {
     id: '2',
     type: 'customNode',
-    data: {
-      children: (props) => <DataSource />
-      , type: 'Dsource'
-    },
+    data: { children: (props) => <DataSource {...props} />, type: 'Dsource' },
     style: { border: '1px solid #777' },
     position: { x: 280, y: 500 },
   },
@@ -202,7 +199,7 @@ export default function App() {
     };
     setElements(els => [...els, newElem]);
     dispatch(addElementsAction([...elements, newElem]));
-  }, [dragableObjects]);
+  }, [dragableObjects, dispatch, elements]);
 
   useEffect(() => {
     dispatch(updateAction(getFlows(getLinks(elements), getNodes(elements))));
