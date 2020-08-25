@@ -6,18 +6,35 @@ from flask import request
 import json
 app = Flask(__name__)
 CORS(app)
-
+import os
+import re
+from utils import get_columns
 
 @app.route('/')
 def index():
     content = request.get_json()
-    print(content)
     return 'Index Page'
 
-@app.route('/hello')
-def hello():
-    return 'Hello, World'
+@app.route('/data-sources')
+def data():
+    files = [f for f in os.listdir('./profile-data') if re.match(r'.*\.csv', f)]
+    response = app.response_class(
+        response = json.dumps(files),
+        status = 200,
+        mimetype = 'application/json'
+    )
+    return response
 
+@app.route('/columns', methods=['GET', 'POST'])
+def columns():
+    content = request.get_json()
+    
+    response = app.response_class(
+        response = json.dumps({'columns' : list(get_columns(content['data']['source']))}),
+        status = 200,
+        mimetype = 'application/json'
+    )
+    return response
 
 @app.route('/getSunburstController', methods=['GET', 'POST'])
 def getSunburstController():

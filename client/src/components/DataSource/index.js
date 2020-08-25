@@ -1,10 +1,19 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import { useDispatch } from 'react-redux';
 import { mappingElementsAction } from '../../store';
 
 export const DataSource = (props) => {
     // get value for select from the server
     const dispatch = useDispatch();
+    const [dataSource, setDataSource] = useState([]);
+    useEffect(() => {
+        axios.get('/data-sources').then(e => {
+            setDataSource(e.data);
+        });
+    }, []);
+
+
     return (
         <div style={{ padding: '40px' }}>
             <form onInput={() => dispatch(mappingElementsAction({
@@ -13,10 +22,19 @@ export const DataSource = (props) => {
                 type: 'source'
             }))}>
                 <label htmlFor="dataSource">Choose a dataSource:</label>
-                <select name="dataSource" id={"dataSource" + props.id}>
-                    <option value="" selected disabled hidden>Choose here</option>
-                    <option value="today">Today</option>
-                    <option value="yesterday">Yesterday</option>
+                <select style={{ textTransform: 'capitalize' }}
+                    name="dataSource"
+                    id={"dataSource" + props.id}
+                    defaultValue='DEFAULT'>
+                    <option value="DEFAULT" disabled hidden>Choose data-source</option>
+                    {
+                        dataSource && dataSource.map((el, key) => {
+                            return <option key={key}
+                                style={{ textTransform: 'capitalize' }}
+                                value={el}
+                            >{el.replace('.csv', '').replace(/_/g, ' ')}</option>
+                        })
+                    }
                 </select>
             </form>
         </div>

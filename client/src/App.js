@@ -8,7 +8,7 @@ import {
   CustomComponent,
   CustomEdge,
   // Filter,
-  // Selector,
+  Selector,
   DataSource,
   OutputNode,
   // DataDisplay
@@ -128,6 +128,11 @@ const getNodes = (elements) => {
   return elements?.filter(e => e.data);
 }
 
+
+// the type is used so that we can see which one is the data source
+/**
+ * Also the output node has a type for :: plotly picture sau text output
+ */
 const initialElements = [
   {
     id: '1',
@@ -139,7 +144,7 @@ const initialElements = [
   {
     id: '2',
     type: 'customNode',
-    data: { children: (props) => <DataSource {...props} />, type: 'Dsource' },
+    data: { children: (props) => <Selector {...props} />, type: 'DSelector' },
     style: { border: '1px solid #777' },
     position: { x: 280, y: 500 },
   },

@@ -7,7 +7,6 @@ const TRIGGER_UPDATE = 'TRIGGER_UPDATE';
 const ADD_ELEMENTS = 'ADD_ELEMENTS';
 const ID_MAPPING = 'ID_MAPPING';
 
-
 // Create Id value mapping
 
 function updateReducer(state = initialState, action) {
@@ -39,7 +38,6 @@ function idMappingReducer(state = initialState, action) {
       return state;
   }
 }
-
 
 export const updateAction = (flow) => {
   return {
