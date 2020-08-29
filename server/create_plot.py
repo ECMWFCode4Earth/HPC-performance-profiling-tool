@@ -4,17 +4,18 @@ import plotly.express as px
 import json
 import pprint
 
-def get_sunburst(functions_to_plot = None):
-    df = pd.read_csv("example_omp1_papi.csv")
+def get_sunburst(source, columns, rows):
+    df = pd.read_csv('./profile-data/' + source)
     # plot the function from the example_omp18_papi.csv
-    print(functions_to_plot)
-    if functions_to_plot == None:
-        functions_to_plot = df.head(100).tail(2)["Function"].to_list() + ['delta_eddington_scat_od', 'cloud_optics']
+    print(rows)
+    print(columns)
+    if rows == None:
+        rows = df.head(100).tail(2)["Function"].to_list() + ['delta_eddington_scat_od', 'cloud_optics']
 
     parsed_dict = {}
     pp = pprint.PrettyPrinter(indent=3)
 
-    with open("callgraph.json") as f:
+    with open('./profile-data/' + 'callgraph.json') as f:
         data = json.load(f)
         for i in data.keys():
             for j in data[i]:
@@ -29,12 +30,11 @@ def get_sunburst(functions_to_plot = None):
                     parsed_dict[name]['parent'] = i
 
     df_parents = pd.DataFrame.from_dict(parsed_dict).transpose()
-    df = df.loc[df["Function"].isin(functions_to_plot)]
-    df_parents = df_parents.loc[df_parents.index.isin(functions_to_plot) & df_parents.parent.isin(functions_to_plot)]
+    df = df.loc[df["Function"].isin(rows)]
+    df_parents = df_parents.loc[df_parents.index.isin(rows) & df_parents.parent.isin(rows)]
     df = df.set_index('Function').join(df_parents).fillna('').reset_index()
 
-    primary_feature = 'WallTime'
-    features = ['Function',"WallTime", 'parent']
+    features = columns + ['parent', 'Function']
 
     df = df[features]
     df = df.to_dict()
@@ -43,9 +43,10 @@ def get_sunburst(functions_to_plot = None):
         if i == "Function":
             df_new['function_name'] = list(df[i].values())
         elif i == "WallTime":
-            df_new['value'] = list(df[i].values())
+            df_new['value'] = list(df[i].values()) # really do not remember what this is for
         else:
             df_new['parent'] = list(df[i].values())
+    print(df_new)
     fig = px.sunburst(
         df_new,
         names='function_name',

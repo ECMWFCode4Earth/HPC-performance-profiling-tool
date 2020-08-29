@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { DataDisplay } from '../';
 import { useSelector } from 'react-redux';
+import axios from 'axios';
 
 const getFlow = (id, flows) => {
     var x = { id: null, flow: null };
@@ -16,10 +17,8 @@ const getFlow = (id, flows) => {
     });
     return x;
 }
+
 const getRequest = ({ flow, id, mapping }) => {
-    console.log('===================')
-    console.log(mapping);
-    console.log('===================')
     let requestObject = {};
     if (!flow || !id || !mapping) {
         return false;
@@ -49,21 +48,44 @@ export const OutputNode = (data) => {
     const mapping = useSelector(state => state.mapping);
 
     const [url, setUrl] = useState(initialState);
+    const [result, setResult] = useState('');
+    // React.useEffect(() => {
+    //     let x = getRequest({ ...getFlow(id, flow), ...mapping });
+    //     if (x) {
+    //         setUrl(x);
+    //     }
+    // }, [mapping, id, flow]);
     React.useEffect(() => {
         let x = getRequest({ ...getFlow(id, flow), ...mapping });
-        if (x)
-            setUrl(x);
+        if (x) {
+            axios.post('/getSunburstController', {
+                data: x
+            }).then(e => setResult(e))
+        }
     }, [mapping, id, flow]);
 
 
     // TODO check the state and if we are connected to something; fetch data
+    // TODO implement the change between server response and what you are sending
+
+    // return (
+    //     <div>
+    //         {type === 'text' ? <pre>
+    //             {JSON.stringify(url, undefined, 2)}
+    //         </pre> : <DataDisplay data={url} id={id} />
+    //         }
+    //     </div>
+    // );
+
+
+
+
     return (
-        <div>
-            {type === 'text' ? <pre>
-                {JSON.stringify(url, undefined, 2)}
-            </pre> : <DataDisplay data={url} id={id} />
+        <div style={{maxWidth:'500px'}}>
+            {type === 'text' ? <pre style={{maxWidth:'500px'}}>
+                {JSON.stringify(result, undefined, 2)}
+            </pre> : <DataDisplay data={result} id={id} />
             }
         </div>
     );
-
 }

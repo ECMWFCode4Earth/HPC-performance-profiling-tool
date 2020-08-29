@@ -8,7 +8,7 @@ app = Flask(__name__)
 CORS(app)
 import os
 import re
-from utils import get_columns
+from utils import get_columns, get_rows
 
 @app.route('/')
 def index():
@@ -36,10 +36,20 @@ def columns():
     )
     return response
 
+@app.route('/rows', methods=['GET', 'POST'])
+def rows():
+    content = request.get_json()
+    response = app.response_class(
+        response = json.dumps({'rows' : list(get_rows(content['data']['source']))}),
+        status = 200,
+        mimetype = 'application/json'
+    )
+    return response
+
 @app.route('/getSunburstController', methods=['GET', 'POST'])
 def getSunburstController():
-    content = request.get_json()['functions_to_plot']
-    x = pio.to_json(get_sunburst(content), remove_uids=False)
+    content = request.get_json()['data']
+    x = pio.to_json(get_sunburst(content['source'], content['columns'], content['rows']), remove_uids=False)
     response = app.response_class(
         response=json.dumps(x),
         status=200,

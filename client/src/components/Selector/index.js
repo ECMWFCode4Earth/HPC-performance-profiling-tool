@@ -35,47 +35,85 @@ const getRequest = ({ flow, id, mapping }) => {
 
 
 export const Selector = (props) => {
-    // This selects the columns that we can see from the data
     const dispatch = useDispatch();
     const [dataSource, setDataSource] = useState([]);
+    const [selected, setSelected] = useState([]);
+    const [disabled, setDisabled] = useState(true);
 
     const flow = useSelector(state => state.flow.flow);
     const mapping = useSelector(state => state.mapping);
 
     let id = props.id;
-    const [disabled, setDisabled] = useState(true);
+    let endpoint = props.endpoint;
+
     useEffect(() => {
-        let x = getRequest({ ...getFlow(id, flow), ...mapping });
+        let x = getRequest({ ...getFlow(id, flow), ...mapping }); // TODO this is ugly
         if (x)
-            axios.post('/columns', {
+            axios.post(`/${endpoint}`, {
                 data: {
                     source: x.source
                 }
             }).then(e => {
                 setDisabled(false);
-                setDataSource(e.data.columns)
+                setDataSource(e.data[endpoint])
             });
         else
             setDisabled(true);
     }, [mapping, id, flow]);
 
-
     return (
         <div style={{ padding: '40px' }}>
-            <form onInput={() => dispatch(mappingElementsAction({
-                id: props.id,
-                value: document.getElementById('column' + props.id).value,
-                type: 'column'
-            }))}>
-                <label htmlFor="column">Choose what columns you want to display:</label>
+            <div style={{
+                display:'flex',
+                flexDirection:'row',
+                flexWrap:'wrap',
+                width: '300px',
+                backgroundColor: '#f3f3f3',
+                marginBottom: '10px'
+            }}>
+                {
+                    selected.map((e, index) => <div style={{
+                        backgroundColor: '#a0a0a0',
+                        display: 'inline-block',
+                        margin: '3px 5px',
+                        padding: '5px',
+                        borderRadius: '10px'
+                    }} key={index} onClick={() => {
+                        setSelected(selected.filter(el => el !== e));
+                        dispatch(mappingElementsAction({
+                            id: props.id,
+                            value: selected.filter(el => el !== e),
+                            type: endpoint
+                        }))
+                    }
+                    }> {e} </div>)
+                }
+            </div>
+            <form
+                style={{ display: 'flex', flexDirection: 'column' }}
+            >
+                <label htmlFor="column">Choose what {endpoint} you want to display:</label>
                 <select style={{ textTransform: 'capitalize' }}
                     name="column"
                     id={"column" + props.id}
+                    onClick={e => {
+                        if (e.target.value!=='DEFAULT')
+                        if (!selected.includes(e.target.value)) {
+                            setSelected([...selected, e.target.value]);
+                            dispatch(mappingElementsAction({
+                                id: props.id,
+                                value: [...selected, e.target.value],
+                                type: endpoint
+                            }))
+                        }
+
+                    }
+                    }
                     disabled={disabled}
                     defaultValue='DEFAULT'>
                     {
-                        dataSource === [] ? <option value="DEFAULT" disabled hidden>Choose columns to plot</option> :
-                            <option value="DEFAULT" disabled hidden>Please choose a data-source</option>
+                        dataSource === [] ? <option value="DEFAULT" disabled hidden>Choose {endpoint} to plot</option> :
+                    <option value="DEFAULT" disabled hidden>Please choose a {endpoint}</option>
                     }
 
                     {
@@ -83,11 +121,13 @@ export const Selector = (props) => {
                             return <option key={key}
                                 style={{ textTransform: 'capitalize' }}
                                 value={el}
+                                disabled={selected.includes(el)}
                             >{el.replace('.csv', '').replace(/_/g, ' ')}</option>
                         })
                     }
                 </select>
             </form>
+
         </div>
     )
 }
