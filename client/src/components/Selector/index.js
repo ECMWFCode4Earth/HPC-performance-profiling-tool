@@ -59,7 +59,7 @@ export const Selector = (props) => {
             });
         else
             setDisabled(true);
-    }, [mapping, id, flow]);
+    }, [mapping, id, flow, endpoint]);
 
     return (
         <div style={{ padding: '40px' }}>

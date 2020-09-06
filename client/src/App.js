@@ -2,9 +2,8 @@ import React, { useState, useEffect } from "react";
 import ReactFlow, { MiniMap } from 'react-flow-renderer';
 import { useDispatch } from 'react-redux'
 // import axios from 'axios';
-import jsonExample from "./example.json";
 import {
-  SidebarMenu,
+  // SidebarMenu,
   CustomComponent,
   CustomEdge,
   // Filter,
@@ -24,19 +23,6 @@ const nodeTypes = {
 const edgeTypes = {
   custom: CustomEdge,
 };
-
-
-
-
-// TODO: link rules add - check if input node or not
-// TODO: add all this components to the sidebar
-// TODO: add selector with the graph from plotly
-// TODO: get the state of the lines
-// TODO define rules for correct mapping
-// TODO add graf type to the server and change it in the request
-// TODO Add rules for the lin in between cells
-// TODO make the output cell null state a bit more attractive
-
 
 const graphStyles = {
   width: '100vw',
@@ -151,46 +137,47 @@ const initialElements = [
     type: 'customNode',
     data: { children: (props) => <Selector {...props} endpoint='columns' />, type: 'DSelector' },
     style: { border: '1px solid #777' },
-    position: { x: 280, y: 500 },
+    position: { x: 280, y: 300 },
   },
-  {
-    id: '3',
-    type: 'customNode',
-    data: {
-      children: (props) => <OutputNode props={props} type='text' url={{
-        "data": {
-          "x": "1",
-          "y": "1",
-          "url": "http://url.com"
-        },
-        "event": "start",
-        "show": 1,
-      }} />
-      , type: 'Onode'
-    },
-    style: { border: '1px solid #777' },
-    position: { x: 280, y: 400 },
-  },
+  // {
+  //   id: '3',
+  //   type: 'customNode',
+  //   data: {
+  //     children: (props) => <OutputNode props={props} type='text' url={{
+  //       "data": {
+  //         "x": "1",
+  //         "y": "1",
+  //         "url": "http://url.com"
+  //       },
+  //       "event": "start",
+  //       "show": 1,
+  //     }} />
+  //     , type: 'Onode'
+  //   },
+  //   style: { border: '1px solid #777' },
+  //   position: { x: 280, y: 400 },
+  // },
   {
     id: '4',
     type: 'customNode',
     data: { children: (props) => <Selector {...props} endpoint='rows' />, type: 'DSelector' },
     style: { border: '1px solid #777' },
-    position: { x: 300, y: 450 },
+    position: { x: 300, y: 500 },
   },
   {
     id: '5',
     type: 'customNode',
     data: { children: (props) => <OutputNode props={props} type='display'/>, type: 'Onode' },
     style: { border: '1px solid #777' },
-    position: { x: 300, y: 450 },
+    position: { x: 300, y: 800 },
   },
 
 ];
 
 export default function App() {
   // const [initialID, setInitialID] = useState(1);
-  const [dragableObjects, setDragableObjects] = useState([]);
+  // const [dragableObjects, setDragableObjects] = useState([]);
+  const [dragableObjects, ] = useState([]);
   const [elements, setElements] = useState(initialElements);
   const dispatch = useDispatch();
 

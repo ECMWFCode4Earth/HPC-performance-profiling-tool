@@ -2,18 +2,17 @@ import plotly.graph_objects as go
 import pandas as pd
 import plotly.express as px
 import json
-import pprint
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 def get_sunburst(source, columns, rows):
     df = pd.read_csv('./profile-data/' + source)
     # plot the function from the example_omp18_papi.csv
-    print(rows)
-    print(columns)
     if rows == None:
         rows = df.head(100).tail(2)["Function"].to_list() + ['delta_eddington_scat_od', 'cloud_optics']
 
     parsed_dict = {}
-    pp = pprint.PrettyPrinter(indent=3)
 
     with open('./profile-data/' + 'callgraph.json') as f:
         data = json.load(f)
@@ -46,7 +45,6 @@ def get_sunburst(source, columns, rows):
             df_new['value'] = list(df[i].values()) # really do not remember what this is for
         else:
             df_new['parent'] = list(df[i].values())
-    print(df_new)
     fig = px.sunburst(
         df_new,
         names='function_name',
@@ -57,3 +55,106 @@ def get_sunburst(source, columns, rows):
     fig.update_layout(width=600,
         height=600,uniformtext=dict(minsize=6, mode='show'))
     return fig
+
+class ComplexRadar():
+    def _invert(self, x, limits):
+        return limits[1] - (x - limits[0])
+
+    def _scale_data(self, data, ranges):
+        """scales data[1:] to ranges[0],
+        inverts if the scale is reversed"""
+        for d, (y1, y2) in zip(data[1:], ranges[1:]):
+            assert (y1 <= d <= y2) or (y2 <= d <= y1)
+        x1, x2 = ranges[0]
+        d = data[0]
+        if x1 > x2:
+            d = self._invert(d, (x1, x2))
+            x1, x2 = x2, x1
+        sdata = [d]
+        for d, (y1, y2) in zip(data[1:], ranges[1:]):
+            if y1 > y2:
+                d = self._invert(d, (y1, y2))
+                y1, y2 = y2, y1
+            sdata.append((d-y1) / (y2-y1) 
+                         * (x2 - x1) + x1)
+        return sdata
+    def create_ranges(self):
+        # we need to change this formula here somehow
+        x = [(self.data[x].min() - (self.data[x].max() - self.data[x].min()) / 5, self.data[x].max() + (self.data[x].max() - self.data[x].min()) / 5) for x in self.labels] 
+        return x
+        
+    def __init__(self, fig, labels, data, functions_to_plot,
+                 n_ordinate_levels=6):
+        # calculate the ranges and the labels
+        self.functions_to_plot = functions_to_plot
+        
+        self.labels = labels
+        self.data = data
+        self.ranges = self.create_ranges()
+        ranges = self.ranges
+        
+        angles = np.arange(0, 360, 360./len(labels))
+
+        axes = [fig.add_axes([0.1,0.1,0.9,0.9],polar=True,
+                label = "axes{}".format(i)) 
+                for i in range(len(labels))]
+        l, text = axes[0].set_thetagrids(angles, 
+                                         labels=labels, fontweight='bold', fontsize=15)
+        axes[0].tick_params(pad=40)
+        
+        
+        [txt.set_rotation(angle-90) for txt, angle 
+             in zip(text, angles)]
+        for ax in axes[1:]:
+            ax.patch.set_visible(False)
+            ax.grid("off")
+            ax.xaxis.set_visible(False)
+            
+        for i, ax in enumerate(axes):
+            grid = np.linspace(*self.ranges[i], 
+                               num=n_ordinate_levels)
+            gridlabel = ["{}".format(round(x,2)) 
+                         for x in grid]
+            if self.ranges[i][0] > self.ranges[i][1]:
+                grid = grid[::-1] # hack to invert grid
+                          # gridlabels aren't reversed
+            gridlabel[0] = "" # clean up origin
+            ax.set_rgrids(grid, labels=gridlabel,
+                         angle=angles[i])
+            ax.set_ylim(*ranges[i])
+        # variables for plotting
+        self.angle = np.deg2rad(np.r_[angles, angles[0]])
+        self.ax = axes[0]
+
+    def _plot(self, data, label):
+        sdata = self._scale_data(data, self.ranges)
+        self.ax.plot(self.angle, np.r_[sdata, sdata[0]], label=label)
+
+    def plot(self):
+        lines = []
+        for label in self.functions_to_plot:
+            vars_plt = self.data.loc[self.data['Function'] == label][self.labels].values.tolist()[0]
+            # not sure here why the output is not flat
+            self._plot(vars_plt, label)
+            lines.append(vars_plt)
+        self.ax.legend(bbox_to_anchor=(1.3, 1))
+        return self.ax
+    def fill(self, data, *args, **kw):
+        sdata = self._scale_data(data, self.ranges)
+        self.ax.fill(self.angle, np.r_[sdata, sdata[0]], *args, **kw)
+
+def get_radar(source, columns, rows):
+
+    font = {'weight' : 'normal',
+            'size'   : 14}
+
+    plt.rc('font', **font)
+    data = pd.read_csv('./profile-data/' + source)
+
+    functions_to_plot = rows
+    data2 = data.loc[data['Function'].isin(functions_to_plot)]
+
+    labels = columns
+    fig1 = plt.figure(figsize=(6, 6))
+    radar = ComplexRadar(fig1, labels, data2, functions_to_plot)
+    return radar

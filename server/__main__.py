@@ -1,14 +1,18 @@
 from flask import Flask
-from create_plot import get_sunburst
+from create_plot import get_sunburst, get_radar
 import plotly.io as pio
 from flask_cors import CORS
 from flask import request
 import json
-app = Flask(__name__)
-CORS(app)
 import os
 import re
 from utils import get_columns, get_rows
+import io
+from flask import Response
+import base64
+
+app = Flask(__name__)
+CORS(app)
 
 @app.route('/')
 def index():
@@ -46,10 +50,34 @@ def rows():
     )
     return response
 
-@app.route('/getSunburstController', methods=['GET', 'POST'])
-def getSunburstController():
+@app.route('/getPlot', methods=['POST'])
+def getPicture():
     content = request.get_json()['data']
-    x = pio.to_json(get_sunburst(content['source'], content['columns'], content['rows']), remove_uids=False)
+    print('===============================')
+    print(content)
+    print('===============================')
+    type = request.get_json()['data']['type']
+
+    if type == 'Sunburst':
+        x = pio.to_json(get_sunburst(content['source'], content['columns'], content['rows']), remove_uids=False)
+    elif type == 'Spider Web':
+        output = io.BytesIO()
+        get_radar(content['source'], content['columns'], content['rows']).plot().figure.savefig(output, bbox_inches='tight')
+        response = app.response_class(
+            response=base64.b64encode(output.getvalue()),
+            status=200,
+            mimetype='application/json'
+        )
+        return response
+
+    # elif type == 'Roofline':
+        # x = pio.to_json(get_sunburst(content['source'], content['columns'], content['rows']), remove_uids=False)
+        # format = "png"
+        # sio = cStringIO.StringIO()
+        # pyplot.savefig(sio, format=format)
+        # print "Content-Type: image/%s\n" % format
+        # sys.stdout.write(sio.getvalue())
+
     response = app.response_class(
         response=json.dumps(x),
         status=200,

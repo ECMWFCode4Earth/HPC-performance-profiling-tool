@@ -3,6 +3,28 @@ import { DataDisplay } from '../';
 import { useSelector } from 'react-redux';
 import axios from 'axios';
 
+async function getImageData({ flow, id, mapping }, url) {
+    let requestObject = {};
+    if (!flow || !id || !mapping) {
+        return false;
+    }
+    let chain = flow.chain;
+
+    for (let i = 0; i < chain.length; i++) {
+        if (!mapping[chain[i]])
+            continue;
+        requestObject[mapping[chain[i]].type] = mapping[chain[i]].val;
+    }
+    requestObject['type'] = url;
+    console.log(requestObject);
+    let data = await axios.post('/getPlot', {
+        data: requestObject,
+        responseType: 'arraybuffer'
+    })
+
+    return `data:image/png;base64,${data.data}`;
+}
+
 const getFlow = (id, flows) => {
     var x = { id: null, flow: null };
     Object.keys(flows).forEach(i => {
@@ -18,8 +40,8 @@ const getFlow = (id, flows) => {
     return x;
 }
 
-const getRequest = ({ flow, id, mapping }) => {
-    let requestObject = {};
+const getRequest = ({ flow, id, mapping }, url) => {
+    let requestObject = { type: url };
     if (!flow || !id || !mapping) {
         return false;
     }
@@ -30,7 +52,7 @@ const getRequest = ({ flow, id, mapping }) => {
             continue;
         requestObject[mapping[chain[i]].type] = mapping[chain[i]].val;
     }
-
+    requestObject['type'] = url;
     return requestObject;
     // get with the id-value selector
 }
@@ -42,49 +64,43 @@ export const OutputNode = (data) => {
     // fetch data from the server
     let type = data.type;
     let id = data.props.id;
-    let initialState = data.url;
 
     const flow = useSelector(state => state.flow.flow);
     const mapping = useSelector(state => state.mapping);
 
-    const [url, setUrl] = useState(initialState);
-    const [result, setResult] = useState('');
-    // React.useEffect(() => {
-    //     let x = getRequest({ ...getFlow(id, flow), ...mapping });
-    //     if (x) {
-    //         setUrl(x);
-    //     }
-    // }, [mapping, id, flow]);
+    const [url, setUrl] = useState('Sunburst');
+    const [result, setResult] = useState();
+
     React.useEffect(() => {
-        let x = getRequest({ ...getFlow(id, flow), ...mapping });
+
+        if (url === 'Spider Web') {
+            getImageData({ ...getFlow(id, flow), ...mapping }, url).then(e => {
+                setResult(e)
+            });
+            return;
+        }
+
+
+        const x = getRequest({ ...getFlow(id, flow), ...mapping }, url);
         if (x) {
-            axios.post('/getSunburstController', {
+            axios.post('/getPlot', {
                 data: x
             }).then(e => setResult(e))
         }
-    }, [mapping, id, flow]);
+    }, [mapping, id, flow, url]);
+
 
 
     // TODO check the state and if we are connected to something; fetch data
-    // TODO implement the change between server response and what you are sending
-
-    // return (
-    //     <div>
-    //         {type === 'text' ? <pre>
-    //             {JSON.stringify(url, undefined, 2)}
-    //         </pre> : <DataDisplay data={url} id={id} />
-    //         }
-    //     </div>
-    // );
-
-
-
 
     return (
-        <div style={{maxWidth:'500px'}}>
-            {type === 'text' ? <pre style={{maxWidth:'500px'}}>
+        <div style={{ maxWidth: '500px', height: '200px', width: '200px' }}>
+            {type === 'text' ? (result ? <pre style={{ maxWidth: '500px' }}>
                 {JSON.stringify(result, undefined, 2)}
-            </pre> : <DataDisplay data={result} id={id} />
+            </pre> : <>
+                    <h1> Output text </h1>
+                    <h2> Please choose a data flow</h2>
+                </>) : <DataDisplay data={result} id={id} setSelection={setUrl} />
             }
         </div>
     );
