@@ -2,8 +2,6 @@ import React, { memo } from 'react';
 
 import { Handle } from 'react-flow-renderer';
 
-
-
 // BUG you can now connect to yourself
 export default memo(({ data, id }) => {
 

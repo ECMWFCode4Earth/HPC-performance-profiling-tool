@@ -14,6 +14,7 @@ import {
 } from './components/';
 import { getFlows } from './utils';
 import { updateAction, addElementsAction } from './store';
+import { useHotkeys } from 'react-hotkeys-hook';
 
 const nodeTypes = {
   customNode: CustomComponent,
@@ -63,6 +64,66 @@ const BasicGraph = ({ elements, setElements }) => {
       }
     };
   }, [selected, setElements, elements, dispatch])
+
+
+  const [copy, setCopy] = useState(false);
+  const [paste, setPaste] = useState(false);
+  useHotkeys('ctrl+c', () => setCopy(true));
+  useHotkeys('ctrl+v', () => setPaste(true));
+  const [clipboard, setClipboard] = useState([]); // :clipboard:
+
+  useEffect(
+    () => {
+      if (!copy) {
+        setPaste(false);
+      }
+
+      if (selected.length > 0 && copy) {
+        setClipboard(selected);
+        // set the copy item
+        // if that item is set paste the item
+        if (clipboard.length > 0 && paste) {
+          setCopy(false);
+          setPaste(false);
+        }
+      }
+    }, [copy, paste, clipboard.length, selected]
+  );
+
+  useEffect(() => {
+    // TODO this elements length will create bugs in the future
+    if (copy && paste) {
+      const res = [
+        ...elements,
+        ...clipboard.map(e => {
+          let newE = { ...e };
+          if (newE.position) {
+            newE.position.y += 200;
+            newE.id += '_copy' + elements.length;
+          }
+          else if (newE.source) {
+            newE.id += '_copy' + elements.length;
+            const regex = /([0-9]*__)(.*)/;
+            const sourceRe = newE.source.match(regex);
+            newE.source = sourceRe[1].replace('__', '_') + `copy${elements.length}__` + sourceRe[2];
+
+            const targetRe = newE.target.match(regex);
+            newE.target = targetRe[1].replace('__', '_') + `copy${elements.length}__` + targetRe[2];
+
+            // TODO You are not yet linking the data
+            // TODO to remove that ugly hack we can get a random number
+            // newE.target.replace(regex, '$1_copy_$2');
+            console.log(newE);
+          }
+          return newE;
+        })
+      ];
+      setElements(res);
+    }
+
+  }, [clipboard, paste, elements, copy, setElements]);
+
+
 
   const onConnect = (params) => {
     setElements((els) => {
@@ -130,14 +191,14 @@ const initialElements = [
     type: 'customNode',
     data: { children: (props) => <DataSource {...props} />, type: 'Dsource' },
     style: { border: '1px solid #777' },
-    position: { x: 250, y: 50 },
+    position: { x: 250, y: 150 },
   },
   {
     id: '2',
     type: 'customNode',
     data: { children: (props) => <Selector {...props} endpoint='columns' />, type: 'DSelector' },
     style: { border: '1px solid #777' },
-    position: { x: 280, y: 300 },
+    position: { x: 250, y: 300 },
   },
   // {
   //   id: '3',
@@ -162,14 +223,14 @@ const initialElements = [
     type: 'customNode',
     data: { children: (props) => <Selector {...props} endpoint='rows' />, type: 'DSelector' },
     style: { border: '1px solid #777' },
-    position: { x: 300, y: 500 },
+    position: { x: 250, y: 500 },
   },
   {
     id: '5',
     type: 'customNode',
-    data: { children: (props) => <OutputNode props={props} type='display'/>, type: 'Onode' },
+    data: { children: (props) => <OutputNode props={props} type='display' />, type: 'Onode' },
     style: { border: '1px solid #777' },
-    position: { x: 300, y: 800 },
+    position: { x: 250, y: 800 },
   },
 
 ];
@@ -177,7 +238,7 @@ const initialElements = [
 export default function App() {
   // const [initialID, setInitialID] = useState(1);
   // const [dragableObjects, setDragableObjects] = useState([]);
-  const [dragableObjects, ] = useState([]);
+  const [dragableObjects,] = useState([]);
   const [elements, setElements] = useState(initialElements);
   const dispatch = useDispatch();
 

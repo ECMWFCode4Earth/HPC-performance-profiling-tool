@@ -9,15 +9,16 @@
 - [x] add graf type to the server and change it in the request
 - [x] clean up the code
 - [] Hook up and display roofline
+
 - [] Clone or re-create a chain and select a second input source (eg. display to spider webs next to each - other)
 - [] Hook both inputs into one output graph (eg. spider web) for comparison.
+
 - [] Source should not change if we are before the selector
 - [] Some state changes on zoom
-- [] Error boundary check
 
 
-// TODO: link rules add - check if input node or not
-// TODO define rules for correct mapping on server
+// TODO define rules for correct mapping on server -  check if input node or not
 // TODO: add all this components to the sidebar
 // TODO: add selector with the graph from plotly
-
+// WHEN NOT focused the items loose their props
+// But keep the data; this is a issue with the randering; force a rerander at the start
