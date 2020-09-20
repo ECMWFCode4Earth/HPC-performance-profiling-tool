@@ -5,6 +5,10 @@ import json
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+import networkx as nx
+import random
+
+
 
 def get_sunburst(source, columns, rows):
     df = pd.read_csv('./profile-data/' + source)
@@ -158,3 +162,80 @@ def get_radar(source, columns, rows):
     fig1 = plt.figure(figsize=(6, 6))
     radar = ComplexRadar(fig1, labels, data2, functions_to_plot)
     return radar
+
+
+def get_DAG():
+    # graph plots
+    parsed_dict = {}
+    nodes = set()
+    edges = []
+    pos = None
+    dim = 2
+    seed = None
+    with open("./profile-data/callgraph.json") as f:
+        data = json.load(f)
+        for i in data.keys():
+            for j in data[i]:
+                name, scope, n_file = j.split(" ")
+                if j not in parsed_dict:
+                    parsed_dict[name] = {}
+                    nodes.add(name)
+                if name == i:
+                    parsed_dict[name]['parent'] = ''
+                else:
+                    parsed_dict[name]['parent'] = i
+
+
+    for i in list(filter(lambda x: parsed_dict[x]['parent'] != '', parsed_dict.keys())):
+        edges.append((i, parsed_dict[i]['parent']))
+        
+    G = nx.Graph()
+    G.add_nodes_from(nodes)
+    if pos is None:
+        pos = {v: [random.randint(0, len(edges)) for i in range(dim)] for v in nodes}
+    nx.set_node_attributes(G, pos, "pos")
+
+    G.add_edges_from(edges)
+
+    edge_x = []
+    edge_y = []
+    for edge in G.edges():
+        x0, y0 = G.nodes[edge[0]]['pos']
+        x1, y1 = G.nodes[edge[1]]['pos']
+        edge_x.append(x0)
+        edge_x.append(x1)
+        edge_x.append(None)
+        edge_y.append(y0)
+        edge_y.append(y1)
+        edge_y.append(None)
+
+    edge_trace = go.Scatter(
+        x=edge_x, y=edge_y,
+        line=dict(width=0.5, color='#888'),
+        mode='lines')
+
+    node_x = []
+    node_y = []
+    for node in nodes:
+        x, y = G.nodes[node]['pos']
+        node_x.append(x)
+        node_y.append(y)
+
+
+    node_trace = go.Scatter(
+        x=node_x, y=node_y,
+        mode='markers',
+        hoverinfo='text',
+        marker=dict(line_width=2))
+
+    node_adjacencies = []
+    node_text = []
+    for node in G.nodes():
+        node_text.append(node)
+
+    node_trace.text = node_text
+
+    fig = go.Figure(data=[edge_trace, node_trace],
+                layout=go.Layout(
+                    titlefont_size=16))
+    return fig

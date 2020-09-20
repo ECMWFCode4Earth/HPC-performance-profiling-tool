@@ -1,5 +1,5 @@
 from flask import Flask
-from create_plot import get_sunburst, get_radar
+from create_plot import get_sunburst, get_radar, get_DAG
 import plotly.io as pio
 from flask_cors import CORS
 from flask import request
@@ -50,12 +50,20 @@ def rows():
     )
     return response
 
+@app.route('/get-sources-tree', methods=['POST'])
+def getSources():
+    content = request.get_json()
+    response = app.response_class(
+        response = pio.to_json(get_DAG()),
+        status = 200,
+        mimetype = 'application/json'
+    )
+    return response
+    
+
 @app.route('/getPlot', methods=['POST'])
 def getPicture():
     content = request.get_json()['data']
-    print('===============================')
-    print(content)
-    print('===============================')
     type = request.get_json()['data']['type']
 
     if type == 'Sunburst':
@@ -85,4 +93,5 @@ def getPicture():
     )
     return response
 
+# TODO create get all adiacent method where you pass in a method name and it gives out all the adiacent methods
 app.run(host='0.0.0.0', port=8080)

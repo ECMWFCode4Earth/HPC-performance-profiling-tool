@@ -10,6 +10,7 @@ import {
   Selector,
   DataSource,
   OutputNode,
+  SelectorPlot
   // DataDisplay
 } from './components/';
 import { getFlows } from './utils';
@@ -200,24 +201,13 @@ const initialElements = [
     style: { border: '1px solid #777' },
     position: { x: 250, y: 300 },
   },
-  // {
-  //   id: '3',
-  //   type: 'customNode',
-  //   data: {
-  //     children: (props) => <OutputNode props={props} type='text' url={{
-  //       "data": {
-  //         "x": "1",
-  //         "y": "1",
-  //         "url": "http://url.com"
-  //       },
-  //       "event": "start",
-  //       "show": 1,
-  //     }} />
-  //     , type: 'Onode'
-  //   },
-  //   style: { border: '1px solid #777' },
-  //   position: { x: 280, y: 400 },
-  // },
+  {
+    id: '3',
+    type: 'customNode',
+    data: { children: (props) => <SelectorPlot {...props} endpoint='get-sources-tree' />, type: 'DSelector' },
+    style: { border: '1px solid #777' },
+    position: { x: 250, y: 300 },
+  },
   {
     id: '4',
     type: 'customNode',
