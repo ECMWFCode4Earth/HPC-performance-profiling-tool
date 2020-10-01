@@ -1,26 +1,33 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useDispatch } from 'react-redux';
+import { useDispatch, connect } from 'react-redux';
 import { mappingElementsAction } from '../../store';
 
-export const DataSource = (props) => {
+const _DataSource = (props) => {
     // get value for select from the server
     const dispatch = useDispatch();
+
     const [dataSource, setDataSource] = useState([]);
     useEffect(() => {
         axios.get('/data-sources').then(e => {
             setDataSource(e.data);
+            if (props.mapping?.mapping && props.mapping?.mapping[-(-props.id)] && document.getElementById("dataSource" + props.id)) {
+                document.getElementById("dataSource" + props.id).selectedIndex = e.data.indexOf(props.mapping?.mapping[-(-props.id)].val) + 1
+            }
         });
+        // eslint-disable-next-line
     }, []);
 
 
     return (
         <div style={{ padding: '40px' }}>
-            <form onInput={() => dispatch(mappingElementsAction({
-                id: props.id,
-                value: document.getElementById('dataSource' + props.id).value,
-                type: 'source'
-            }))}>
+            <form onInput={() => {
+                dispatch(mappingElementsAction({
+                    id: props.id,
+                    value: document.getElementById('dataSource' + props.id).value,
+                    type: 'source'
+                }))
+            }}>
                 <label htmlFor="dataSource">Choose a dataSource:</label>
                 <select style={{ textTransform: 'capitalize' }}
                     name="dataSource"
@@ -40,3 +47,11 @@ export const DataSource = (props) => {
         </div>
     )
 }
+
+const mapStateToProps = (state) => {
+    return { mapping: state.mapping }
+}
+
+export const DataSource = connect(
+    mapStateToProps
+)(_DataSource);

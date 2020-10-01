@@ -26,15 +26,12 @@ export const DataDisplay = (props) => {
             height: '200px',
             width: '200px'
         }}>
+            <select name="graph-type" id="graph-type" onInput={e => setSelection(e.target.value)}>
+                {options.map((e, idx) => <option key={idx} value={e}>{e}</option>)}
+            </select>
             {
                 data ? (<>
-                    <select name="graph-type" id="graph-type" onInput={e => setSelection(e.target.value)}>
-                        {options.map((e, idx) => <option key={idx} value={e}>{e}</option>)}
-                    </select>
-                    {selection === 'Spider Web' ? <img style={{
-                        filter: 'invert(100%)', 
-                        opacity: '0.4'
-                    }} height='500px' width='500px' src={data} alt='plot' /> :
+                    {selection === 'Spider Web' ? <img height='500px' width='500px' src={data} alt='plot' /> :
                         <Plot
                             onClickAnnotation={e => console.log(e)}
                             onClick={e => console.log(e)}

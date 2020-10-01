@@ -18,7 +18,8 @@ export function SidebarMenu(
             alignContent: 'center',
             alignItems: 'center'
         }}
-            onClick={() => componentCallback(componentLocation)}>
+            onClick={componentCallback}
+        >
             <div style={{
                 position: 'relative',
                 maxWidth: '60px',
@@ -27,9 +28,9 @@ export function SidebarMenu(
             }}>
                 <img
                     height='60px'
-                    width='auto'
+                    width='60px'
                     style={{ maxHeight: "60px" }}
-                    alt={"Logo"} src={window.location.origin + "/assets/" + componentImage}></img>
+                    alt={"Logo"} src={`${componentImage}`}></img>
             </div>
             <p className="mdc-typography--headline1" style={{ marginLeft: '10px' }}>{componentName}</p>
         </div>

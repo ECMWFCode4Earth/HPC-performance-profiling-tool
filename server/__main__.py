@@ -32,7 +32,7 @@ def data():
 @app.route('/columns', methods=['GET', 'POST'])
 def columns():
     content = request.get_json()
-    
+    print(content)
     response = app.response_class(
         response = json.dumps({'columns' : list(get_columns(content['data']['source']))}),
         status = 200,

@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useDispatch } from 'react-redux';
 import { mappingElementsAction } from '../../store';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch, connect } from 'react-redux';
 
 const getFlow = (id, flows) => {
     var x = { id: null, flow: null };
@@ -23,7 +22,10 @@ const getRequest = ({ flow, id, mapping }) => {
     if (!flow || !id || !mapping) {
         return false;
     }
-    let chain = flow.chain;
+    let chain = flow.flows[id];
+    console.log(chain)
+    console.log(flow)
+    console.log(id)
 
     for (let i = 0; i < chain.length; i++) {
         if (!mapping[chain[i]])
@@ -34,7 +36,8 @@ const getRequest = ({ flow, id, mapping }) => {
 }
 
 
-export const Selector = (props) => {
+const _Selector = (props) => {
+    // TODO BUG can not set selected index of null; can not reproduce
     const dispatch = useDispatch();
     const [dataSource, setDataSource] = useState([]);
     const [selected, setSelected] = useState([]);
@@ -60,6 +63,14 @@ export const Selector = (props) => {
         else
             setDisabled(true);
     }, [mapping, id, flow, endpoint]);
+
+
+    useEffect(() => {
+        if (props.mapping?.mapping && props.mapping?.mapping[-(-props.id)]) {
+            setSelected(props.mapping?.mapping[-(-props.id)].val)
+        }
+        // eslint-disable-next-line
+        }, []);
 
     return (
         <div style={{ padding: '40px' }}>
@@ -131,3 +142,13 @@ export const Selector = (props) => {
         </div>
     )
 }
+
+
+const mapStateToProps = (state) => {
+    return { mapping: state.mapping }
+}
+
+export const Selector = connect(
+    mapStateToProps
+)(_Selector);
+
