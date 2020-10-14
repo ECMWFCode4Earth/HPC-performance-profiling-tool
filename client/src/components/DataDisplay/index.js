@@ -8,6 +8,7 @@ export const DataDisplay = (props) => {
 
     const options = ['Sunburst', 'Spider Web', 'Roofline'];
     useEffect(() => {
+        console.log(props)
         try {
             setData(JSON.parse(props.data.data));
         }
@@ -23,8 +24,8 @@ export const DataDisplay = (props) => {
     return (
         <div style={{
             backgroundColor: 'white',
-            height: '200px',
-            width: '200px'
+            height: '800px',
+            width: '800px'
         }}>
             <select name="graph-type" id="graph-type" onInput={e => setSelection(e.target.value)}>
                 {options.map((e, idx) => <option key={idx} value={e}>{e}</option>)}

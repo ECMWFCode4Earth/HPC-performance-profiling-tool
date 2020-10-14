@@ -32,7 +32,6 @@ def data():
 @app.route('/columns', methods=['GET', 'POST'])
 def columns():
     content = request.get_json()
-    print(content)
     response = app.response_class(
         response = json.dumps({'columns' : list(get_columns(content['data']['source']))}),
         status = 200,
@@ -53,13 +52,44 @@ def rows():
 @app.route('/get-sources-tree', methods=['POST'])
 def getSources():
     content = request.get_json()
+    # [fig, labels, parsed_dict] 
+    thdict = {
+        'fig' : pio.to_json(get_DAG()[0]),
+        'labels' : get_DAG()[1],
+        'dictionary' :  get_DAG()[2]
+    }
+
     response = app.response_class(
-        response = pio.to_json(get_DAG()),
+        response = pio.to_json(get_DAG()[0]),
         status = 200,
         mimetype = 'application/json'
     )
+
     return response
-    
+@app.route('/get-sources-tree-labels', methods=['POST'])
+def getSources2():
+    content = request.get_json()
+    # [fig, labels, parsed_dict] 
+    response = app.response_class(
+        response = get_DAG()[1],
+        status = 200,
+        mimetype = 'application/json'
+    )
+
+    return response
+
+@app.route('/get-sources-tree-parse-dict', methods=['POST'])
+def getSources1():
+    content = request.get_json()
+    # [fig, labels, parsed_dict] 
+
+    response = app.response_class(
+        response = get_DAG()[2],
+        status = 200,
+        mimetype = 'application/json'
+    )
+
+    return response
 
 @app.route('/getPlot', methods=['POST'])
 def getPicture():

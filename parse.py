@@ -1,5 +1,4 @@
 import json 
-import pprint 
 import pandas as pd
 
 parsed_dict = {}
@@ -26,6 +25,4 @@ with open("callgraph.json") as f:
             else:
                 parsed_dict[name]['parent'] = i
 df = pd.DataFrame.from_dict(parsed_dict).transpose()
-print(df.head(19))
-print(df.parent)
 #pp.pprint(parsed_dict)

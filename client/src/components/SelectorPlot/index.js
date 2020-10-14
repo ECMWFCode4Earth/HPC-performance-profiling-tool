@@ -4,10 +4,22 @@ import Plot from 'react-plotly.js';
 
 export const SelectorPlot = () => {
     const [data, setData] = useState();
+    const [labels, setLabels] = useState();
+    const [parseDict, setParseDict] = useState();
     useEffect(() => {
         axios.post('/get-sources-tree').then(e => {
             console.log(e);
             setData(e.data);
+        });
+
+        axios.post('/get-sources-tree-labels').then(e => {
+            console.log(e);
+            setLabels(e.data);
+        });
+
+        axios.post('/get-sources-tree-parse-dict').then(e => {
+            console.log(e);
+            setParseDict(e.data);
         });
     }, []);
 
@@ -20,6 +32,8 @@ export const SelectorPlot = () => {
             width: '200px'
         }}>
             {data && <Plot
+                parseDict={parseDict}
+                labels={labels}
                 onClickAnnotation={e => console.log(e)}
                 onClick={e => console.log(e?.points[0]?.text)}
                 data={data.data}

@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import networkx as nx
 import random
-
+from collections import defaultdict
 
 
 def get_sunburst(source, columns, rows):
@@ -164,35 +164,72 @@ def get_radar(source, columns, rows):
     return radar
 
 
-def get_DAG():
+def get_DAG(depth = 3, labelName = None):
     # graph plots
-    parsed_dict = {}
+    parsed_dict = defaultdict(dict)
     nodes = set()
     edges = []
     pos = None
     dim = 2
     seed = None
-    with open("./profile-data/callgraph.json") as f:
+
+    old = 'MASTER' 
+    labels = []
+
+    with open("callgraph.json") as f:
         data = json.load(f)
         for i in data.keys():
             for j in data[i]:
-                name, scope, n_file = j.split(" ")
-                if j not in parsed_dict:
-                    parsed_dict[name] = {}
-                    nodes.add(name)
-                if name == i:
-                    parsed_dict[name]['parent'] = ''
-                else:
-                    parsed_dict[name]['parent'] = i
+                if old != None:
+                    parsed_dict[old]['parent'] = j
+                    parsed_dict[old]['depth'] = len(data[i]) - 1
+                    parsed_dict[old]['finalParent'] = data[i][-1]
+                old = j
+            labels.append(data[i][-1])
+            parsed_dict[data[i][-1]]['parent'] = 'MASTER'
+            parsed_dict[data[i][-1]]['depth'] = 0
+            parsed_dict[old]['finalParent'] = data[i][-1]
+            
+            
+            # The last is the top level
+            # so it has no parent
+            # but also it is a label
+            old =  'MASTER' 
 
+    parsed_dict = dict(parsed_dict)
+    data = list(filter(lambda x: parsed_dict[x]['finalParent'] == 'MASTER' and
+                    parsed_dict[x]['depth'] < depth,
+                        parsed_dict.keys()))
+    newData = set(data)
+    for i in data:
+        newData.add(parsed_dict[i]['parent'])
+    for i in newData:
+        local_depth = depth
+        parent = parsed_dict[i]['parent']
+        local = i
+        if parent == None or i == None:
+            continue
 
-    for i in list(filter(lambda x: parsed_dict[x]['parent'] != '', parsed_dict.keys())):
-        edges.append((i, parsed_dict[i]['parent']))
-        
+        while local_depth >= 0:
+            edges.append((local, parent))
+            if i in newData or parent in newData:
+                nodes.add(i)
+                nodes.add(parent)
+            if i:
+                parent = parsed_dict[i]['parent']
+            else:
+                edges.append((local, ''))
+                nodes.add(i)
+                nodes.add(parent)
+                nodes.add('SourceOfGraph')
+                break
+            local_depth -= 1
+                
+    # END get depth of the data
+                
     G = nx.Graph()
-    G.add_nodes_from(nodes)
-    if pos is None:
-        pos = {v: [random.randint(0, len(edges)) for i in range(dim)] for v in nodes}
+    G.add_nodes_from(list(nodes))
+    pos = {v: [random.randint(0, len(edges)) for i in range(dim)] for v in nodes} # TODO this is not good in here 
     nx.set_node_attributes(G, pos, "pos")
 
     G.add_edges_from(edges)
@@ -213,7 +250,6 @@ def get_DAG():
         x=edge_x, y=edge_y,
         line=dict(width=0.5, color='#888'),
         mode='lines')
-
     node_x = []
     node_y = []
     for node in nodes:
@@ -238,4 +274,5 @@ def get_DAG():
     fig = go.Figure(data=[edge_trace, node_trace],
                 layout=go.Layout(
                     titlefont_size=16))
-    return fig
+    return [fig, labels, parsed_dict] 
+
