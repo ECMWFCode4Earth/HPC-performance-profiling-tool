@@ -16,7 +16,6 @@ async function getImageData({ flow, id, mapping }, url) {
         requestObject[mapping[chain[i]].type] = mapping[chain[i]].val;
     }
     requestObject['type'] = url;
-    console.log(requestObject);
     let data = await axios.post('/getPlot', {
         data: requestObject,
         responseType: 'arraybuffer'
@@ -94,7 +93,7 @@ export const OutputNode = (data) => {
     // TODO check the state and if we are connected to something; fetch data
 
     return (
-        <div style={{ maxWidth: '500px', height: '200px', width: '200px' }}>
+        <div style={{ maxWidth: '600px', height: '600px', width: '600px' }}>
             {type === 'text' ? (result ? <pre style={{ maxWidth: '500px' }}>
                 {JSON.stringify(result, undefined, 2)}
             </pre> : <>

@@ -64,8 +64,8 @@ def getSources():
         status = 200,
         mimetype = 'application/json'
     )
-
     return response
+
 @app.route('/get-sources-tree-labels', methods=['POST'])
 def getSources2():
     content = request.get_json()
@@ -75,7 +75,6 @@ def getSources2():
         status = 200,
         mimetype = 'application/json'
     )
-
     return response
 
 @app.route('/get-sources-tree-parse-dict', methods=['POST'])
@@ -88,17 +87,23 @@ def getSources1():
         status = 200,
         mimetype = 'application/json'
     )
-
     return response
 
 @app.route('/getPlot', methods=['POST'])
 def getPicture():
     content = request.get_json()['data']
+    
     type = request.get_json()['data']['type']
+
+    print(content)
 
     if type == 'Sunburst':
         x = pio.to_json(get_sunburst(content['source'], content['columns'], content['rows']), remove_uids=False)
     elif type == 'Spider Web':
+        if 'columns' not in content:
+            return
+        if 'rows' not in content:
+            return
         output = io.BytesIO()
         get_radar(content['source'], content['columns'], content['rows']).plot().figure.savefig(output, bbox_inches='tight')
         response = app.response_class(

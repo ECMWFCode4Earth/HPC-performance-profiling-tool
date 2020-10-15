@@ -5,7 +5,11 @@ import { useSelector, useDispatch, connect } from 'react-redux';
 
 const getFlow = (id, flows) => {
     var x = { id: null, flow: null };
+    console.log(id)
+    console.log(flows)
     Object.keys(flows).forEach(i => {
+        console.log(flows[i].chain)
+        console.log(flows[i])
         if (flows[i]?.chain.includes(id)) {
             // Just returning here because a node is part form just one flow
             x = {
@@ -23,9 +27,6 @@ const getRequest = ({ flow, id, mapping }) => {
         return false;
     }
     let chain = flow.flows[id];
-    console.log(chain)
-    console.log(flow)
-    console.log(id)
 
     for (let i = 0; i < chain.length; i++) {
         if (!mapping[chain[i]])
@@ -50,7 +51,8 @@ const _Selector = (props) => {
     let endpoint = props.endpoint;
 
     useEffect(() => {
-        let x = getRequest({ ...getFlow(id, flow), ...mapping }); // TODO this is ugly
+        let x = getRequest({ ...getFlow(id, flow), ...mapping });
+        // If x is a list than change on the server
         if (x)
             axios.post(`/${endpoint}`, {
                 data: {

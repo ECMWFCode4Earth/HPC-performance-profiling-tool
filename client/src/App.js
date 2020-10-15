@@ -91,29 +91,27 @@ const BasicGraph = ({ elements, setElements }) => {
   );
 
   useEffect(() => {
-    // TODO this elements length will create bugs in the future
+// There are some connection issues also they do not keep the state
     if (copy && paste) {
       const res = [
         ...elements,
-        ...clipboard.map(e => {
-          let newE = { ...e };
-          if (newE.position) {
-            newE.position.y += 200;
+        ...clipboard.map((e, index) => {
+          let element = elements.filter(elem => elem.id === e.id);
+          if (!element || !element.length > 0)
+            return null;
+          let newE = {...element[0]};
+
+          if (newE?.type === 'customNode') {
+            newE.position = { x: 300, y: 900 + (index) * (200) };
             newE.id += '_copy' + elements.length;
-          }
-          else if (newE.source) {
+          } else {
+            // TODO copy of a copy problems
             newE.id += '_copy' + elements.length;
             const regex = /([0-9]*__)(.*)/;
             const sourceRe = newE.source.match(regex);
             newE.source = sourceRe[1].replace('__', '_') + `copy${elements.length}__` + sourceRe[2];
-
             const targetRe = newE.target.match(regex);
             newE.target = targetRe[1].replace('__', '_') + `copy${elements.length}__` + targetRe[2];
-
-            // TODO You are not yet linking the data
-            // TODO to remove that ugly hack we can get a random number
-            // newE.target.replace(regex, '$1_copy_$2');
-            console.log(newE);
           }
           return newE;
         })
@@ -124,8 +122,13 @@ const BasicGraph = ({ elements, setElements }) => {
   }, [clipboard, paste, elements, copy, setElements]);
 
 
+  useEffect(() => {
+    console.log(elements)
+  }, [elements])
+
 
   const onConnect = (params) => {
+    console.log(params)
     setElements((els) => {
       const edge = {
         ...params,
@@ -179,45 +182,12 @@ const getNodes = (elements) => {
 }
 
 
-// the type is used so that we can see which one is the data source
 /**
  * Also the output node has a type for :: plotly picture sau text output
  * TODO create factory for the nodes; 
  * Add every node in there
  */
-const initialElements = [
-
-  // {
-  //   id: '8',
-  //   type: 'customNode',
-  //   data: { children: (props) => <DataSource {...props} />, type: 'Dsource' },
-  //   style: { border: '1px solid #777' },
-  //   position: { x: 250, y: 150 },
-  // },
-  // {
-  //   id: '2',
-  //   type: 'customNode',
-  //   data: { children: (props) => <Selector {...props} endpoint='columns' />, type: 'DSelector' },
-  //   style: { border: '1px solid #777' },
-  //   position: { x: 250, y: 300 },
-  // },
-  // {
-  //   id: '3',
-  //   type: 'customNode',
-  //   data: { children: (props) => <SelectorPlot {...props} endpoint='get-sources-tree' />, type: 'DSelector' },
-  //   style: { border: '1px solid #777' },
-  //   position: { x: 250, y: 300 },
-  // },
-  // {
-  //   id: '4',
-  //   type: 'customNode',
-  //   data: { children: (props) => <Selector {...props} endpoint='rows' />, type: 'DSelector' },
-  //   style: { border: '1px solid #777' },
-  //   position: { x: 250, y: 500 },
-  // },
-
-
-];
+const initialElements = [];
 
 export default function App() {
   const [dragableObjects,] = useState([]);
@@ -238,6 +208,7 @@ export default function App() {
   }, [dragableObjects, dispatch, elements]);
 
   useEffect(() => {
+    // DEBUG This works
     dispatch(updateAction(getFlows(getLinks(elements), getNodes(elements))));
   }, [elements, dispatch]);
 
@@ -247,20 +218,7 @@ export default function App() {
   const stateSave = useSelector(state => state);
 
   const sideBarObject = [
-    {
-      name: 'Selector',
-      img: 'https://www.zmangames.com/static/admin/img/search.svg',
-      callback: () => setElements(e => [
-        ...e,
-        {
-          id: getID(e),
-          type: 'customNode',
-          data: { children: (props) => <Selector {...props} endpoint='columns' />, type: 'DSelector' },
-          style: { border: '1px solid #777' },
-          position: { x: 100, y: 100 },
-        },
-      ])
-    },
+
     {
       name: 'Source',
       img: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPsAAADJCAMAAADSHrQyAAAAeFBMVEUAAAD///+0tLT5+fnl5eVpaWny8vLR0dHLy8vHx8fY2NihoaHq6uo5OTnu7u6QkJC8vLwsLCytra3b29t1dXW/v79QUFBHR0cYGBgtLS0+Pj4QEBBoaGiCgoKXl5cfHx9cXFyMjIx6eno6OjpfX18cHBwLCwulpaV0BnBuAAAGYElEQVR4nO2d63ayOhBAgyB4Fy+t1apVv576/m94QLTlEmASJoRk2L9dC/YCk8lkMjCHLkz3DWikd6dJ706T3p0mvTtNeneaqHV3Z5NxOIgJx5OFq/Ra4qhyn42nw90Hy/KxG05HC0VXFEeF+2y9XbFy9qc3X8FVxUF39877Cu8Xh2kHHj+uu3+HiCfsBqiXlgDTPfgGiyecPMSri4PnHs4FzWPeA7Tri4PlHlaNbpX2E6Q7EAfHPfgnaR7zPUO5B3Ew3BeXBuYxV4SbkADBfdrQPGbc/DbEaezuHRDUGRtqCHibuq9RzCM+2x/xG7ofsdQjpjhGcBq5z2QnNj5HLCkgTdwDVPOIfbtrnAbuA2x1xn5aDXLl3TGmtiJtRnnS7ksl6oy1ONzLuqtSb/PJS7qreeETNriG5ci5KxjmUrS1tpFyHylVZ18txbcy7p5a9WhNj67JRcb9S7U7O6F78pBwF83KyRDyLuxvgojJBisAEndHW7lVkkthe4NTOh242k4R4gBhd+V/9oRd6pLBLb/B8+A4aBj+C7vLZGNlOD+v558rhpdho6cv6q4yqMny+FcvbjW/mr+15j5rRftB9Na7J8DvDtJBsKB7G2P8i3UI/OFWMhYSc1cc0Ekjl+YVc29roBNGKhgScoe+hBq4SLz3Qu64qUlcVuKTvYh7hx97xKewvIg7vK5AD6LyAu7oKWlsRNf9Au5tzu1yXFS5+7rNAFwVubcXyTdgpMa96yNdgshfHuy+0W0FY6vC/azbCojAqg7sjlNeoZ4DvvtCtxMY+JoO6q52JwaTXb2MoPtWtxIccA4P6t7ZlXsR8FAPdDchqPsFOscD3buarOLC3dSRd29nMwYJaL0W0N2goS4C1/1dt44QwNgO6K7bRow7YXfgLAdzb3ErCgNgTA9zn+i2EQTT3ajpnUGjG5j7WLeMILCqFDvdYZOcne6wlKWd7rD8Re9eh2njPOY7f9ctIwjaWOctueVtXQa2I1vrHpi1hEsAqde5T3a6NWSYI7h7F90WcjRfx7l1NY2dZd3U/U23gTzAEzel7mZl6LLA1MvcN//pvv8GDBu5mxbLZIGWVnPdh7rvvhlAdZ67a+ScnmI/XIOSF0V3v8uVo2D253r9gvviU/dtY7Gvm+bz7kZtuNZyrewYlnP3rXnqT24VS7qcu0ElBlCWpQnrrHv3S2Yl+Cnbj8+4X3XfpiKO/Eefdjd49VIHN4GXcjenhE6Cc7W7KZWTcnAKUf7c1XXv6Abzwmz3697S+WaNfOQDnV93E9Oxgvws+O7dPv+FxYLrrvuu2uHD57ibcjKgKYeiu6v7nlrjWHCn8thZpjsiI/RvT9hk3Y2qFG7KV9bdjKNvWNzS7p0/5IvMKOVu8vaTDPuUu+57aZ37r7tpRVQIuC93aq98xPLlbltaGoKbuBtywBmXaeJu9n6zJJ+Ju+EbzpK8Pdx/dN+GFuK2IMyuzUc4fuROLaB9sY7czTnYjkv00jPb0/KluA4jGNUljB1GIC/P5+ow9Q2WO8q7w2hO7zH01u5/GHbIFxXTDkBhcif8f78yipmLhBsz7vwXGt+M1r5EmgPduI6t6Mbz0Uhnay0lBJKpygefjOCuzJMPZn9dXRlzwquZd+aYfipKmhtzIN/ysJIlI1JRyWHALDsZJUDAbK+bL8dnpAoL0/zEtQckN+Djk+JxrZEVB2CFuT/caW5LeQ93ksna1bOm9KL7RjRwerpTzFQHrxpyeqPd12/9PL0ChPPfeRlyu7GzP3dqC5pj6pwUtaB+k3anVW717qTdaVVTb7LudI7IMfbtZN1t7nqQZ5Z3p1NUvHQK7lSy1SuH404kiRHw3Gmcj1w6XHdrG9ykSH1qK9fTycrGRhncUnfr216kW5gW+tfZHdhnmrMX+xbavDeZ7ebH6Vdp72ufa+zEa+pp67Jm6tS7W5qwL7Sv5DdztbEIp9jGraSR7cK2EW/Fadla2sTXrt1Zbovq8gbGnkV9Owdcw6rmzbaUHR5L+rRWNq52bahDWpV+bKamaffM2O8uvMhP6nD3aMQ3erKvMId9Vyg0dMKb84c4Iffo1T8bt2H3taxtwg5u0u+th+b4H86QT42A3WNm4fLS9fM18+E9gH1OSsz9get7o3DQQcJwNPGh3wCXc7eH3p0mvTtNenea9O406d1pQtn9fybEYyTM6VOlAAAAAElFTkSuQmCC',
@@ -272,6 +230,20 @@ export default function App() {
           data: { children: (props) => <DataSource {...props} />, type: 'Dsource' },
           style: { border: '1px solid #777' },
           position: { x: 250, y: 150 },
+        },
+      ])
+    },
+    {
+      name: 'Selector',
+      img: 'https://www.zmangames.com/static/admin/img/search.svg',
+      callback: () => setElements(e => [
+        ...e,
+        {
+          id: getID(e),
+          type: 'customNode',
+          data: { children: (props) => <Selector {...props} endpoint='columns' />, type: 'DSelector' },
+          style: { border: '1px solid #777' },
+          position: { x: 100, y: 100 },
         },
       ])
     },
@@ -311,7 +283,7 @@ export default function App() {
         {
           id: getID(e),
           type: 'customNode',
-          data: { children: (props) => <SelectorPlot {...props} endpoint='get-sources-tree' />, type: 'DSelector'},
+          data: { children: (props) => <SelectorPlot {...props} endpoint='get-sources-tree' />, type: 'DSelector' },
           style: { border: '1px solid #777' },
           position: { x: 100, y: 100 },
         },

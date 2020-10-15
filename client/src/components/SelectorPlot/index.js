@@ -8,17 +8,14 @@ export const SelectorPlot = () => {
     const [parseDict, setParseDict] = useState();
     useEffect(() => {
         axios.post('/get-sources-tree').then(e => {
-            console.log(e);
             setData(e.data);
         });
 
         axios.post('/get-sources-tree-labels').then(e => {
-            console.log(e);
             setLabels(e.data);
         });
 
         axios.post('/get-sources-tree-parse-dict').then(e => {
-            console.log(e);
             setParseDict(e.data);
         });
     }, []);

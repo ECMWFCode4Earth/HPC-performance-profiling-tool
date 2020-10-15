@@ -5,23 +5,35 @@ export const getFlows = (links, nodes) => {
     let flow = [];
     let linksName = links.map(e => {
         return {
-            'src': e.source.replace(/_.*/gi, ''),
-            'dst': e.target.replace(/_.*/gi, '')
+            'src': e.source.replace(/__.*/gi, ''),
+            'dst': e.target.replace(/__.*/gi, '')
         }
     });
     links.map(e => {
         if (e.source.endsWith('Dsource'))
-            dataSources.push(e.source.replace(/_.*/gi, ''));
+            dataSources.push(e.source.replace(/__.*/gi, ''));
         return null;
     });
 
+
     dataSources.map(s => {
         let chains = dfs(s, [], linksName, []);
+        console.log(chains)
+        console.log(Object.keys(chains))
         let longest_chain = Object.keys(chains).reduce((max, k) => {
-            if (chains[k].length > max.length)
-                return chains[k];
-            return max
+            console.log(max)
+            console.log(chains[k])
+            console.log(max.length)
+            var maxLen = max.length
+            var chainLen = chains[k].length
+            if (typeof max === 'string')
+                maxLen = 1;
+            if (typeof chains[k] === 'string')
+                chainLen = 1;
+            return maxLen > chainLen ? max : chains[k];
         });
+        console.log(longest_chain)
+
         flow[s] = {
             source: s,
             chain: longest_chain,
@@ -50,25 +62,3 @@ const dfs = (source, stack, graph, graphParents) => {
 
 }
 
-
-/**
- * so now we have the datasources
- * keep the source and the body so far
- * indexat dupa flow number [{
- *     backend_request: [
- *          {
- *              source: 'Today'
- *          },
- *          {
- *             'function_names': [],
- *          },
- *
- * ],
- *     source: 'id_source',
- *     flow: [],
- * }]
- *
- * you know your id;
- * based on that if iterate over the flows and see from which flow are you part from;
- * based on that id you know how much of the backend_request you can make
- */

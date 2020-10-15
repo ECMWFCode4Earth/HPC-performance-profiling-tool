@@ -22,16 +22,14 @@ def get_sunburst(source, columns, rows):
         data = json.load(f)
         for i in data.keys():
             for j in data[i]:
-                name, scope, n_file = j.split(" ")
+                name = j
                 if j not in parsed_dict:
                     parsed_dict[name] = {}
-                    parsed_dict[name]['scope'] = scope.replace("[","").replace("]","")
-                    parsed_dict[name]['file'] = n_file.replace("(","").replace(")","")
                 if name == i:
                     parsed_dict[name]['parent'] = None
                 else:
                     parsed_dict[name]['parent'] = i
-
+# TODO fix me
     df_parents = pd.DataFrame.from_dict(parsed_dict).transpose()
     df = df.loc[df["Function"].isin(rows)]
     df_parents = df_parents.loc[df_parents.index.isin(rows) & df_parents.parent.isin(rows)]
@@ -82,7 +80,9 @@ class ComplexRadar():
             sdata.append((d-y1) / (y2-y1) 
                          * (x2 - x1) + x1)
         return sdata
-    def create_ranges(self):
+    def create_ranges(self, data=None):
+        if data is not None:
+            return [(data[x].min() - (data[x].max() - data[x].min()) / 5, data[x].max() + (data[x].max() - data[x].min()) / 5) for x in self.labels] 
         # we need to change this formula here somehow
         x = [(self.data[x].min() - (self.data[x].max() - self.data[x].min()) / 5, self.data[x].max() + (self.data[x].max() - self.data[x].min()) / 5) for x in self.labels] 
         return x
@@ -93,8 +93,13 @@ class ComplexRadar():
         self.functions_to_plot = functions_to_plot
         
         self.labels = labels
-        self.data = data
-        self.ranges = self.create_ranges()
+        self.data = data[0]
+        try:
+            self.data_second = data[1]
+            self.ranges = self.create_ranges(pd.concat([data[0], data[1]]))
+        except:
+            self.ranges = self.create_ranges()
+        
         ranges = self.ranges
         
         angles = np.arange(0, 360, 360./len(labels))
@@ -130,29 +135,52 @@ class ComplexRadar():
         self.angle = np.deg2rad(np.r_[angles, angles[0]])
         self.ax = axes[0]
 
-    def _plot(self, data, label):
+    def _plot(self, data, label, line='-'):
         sdata = self._scale_data(data, self.ranges)
-        self.ax.plot(self.angle, np.r_[sdata, sdata[0]], label=label)
+        self.ax.plot(self.angle, np.r_[sdata, sdata[0]], line, label=label)
 
     def plot(self):
         lines = []
         for label in self.functions_to_plot:
             vars_plt = self.data.loc[self.data['Function'] == label][self.labels].values.tolist()[0]
-            # not sure here why the output is not flat
             self._plot(vars_plt, label)
             lines.append(vars_plt)
+        try:
+            for label in self.functions_to_plot:
+                vars_plt = self.data_second.loc[self.data_second['Function'] == label][self.labels].values.tolist()[0]
+                self._plot(vars_plt, label + 'Opt', '--')
+                lines.append(vars_plt)
+        except:
+            print('Simple data')
         self.ax.legend(bbox_to_anchor=(1.3, 1))
         return self.ax
     def fill(self, data, *args, **kw):
         sdata = self._scale_data(data, self.ranges)
         self.ax.fill(self.angle, np.r_[sdata, sdata[0]], *args, **kw)
 
-def get_radar(source, columns, rows):
 
-    font = {'weight' : 'normal',
-            'size'   : 14}
+def get_radar(source, columns, rows):
+    font = {
+        'weight' : 'normal',
+        'size'   : 12
+    }
 
     plt.rc('font', **font)
+    if isinstance(source, list):
+        labels = columns
+        functions_to_plot = rows
+
+        data = pd.read_csv('./profile-data/' + source[0])
+        data2 = data.loc[data['Function'].isin(functions_to_plot)]
+
+        data_complex = pd.read_csv('./profile-data/' + source[1])
+        data_complex2 = data_complex.loc[data_complex['Function'].isin(functions_to_plot)]
+        fig1 = plt.figure(figsize=(6, 6))
+        radar = ComplexRadar(fig1, labels, [data2, data_complex2], functions_to_plot)
+        return radar
+
+
+
     data = pd.read_csv('./profile-data/' + source)
 
     functions_to_plot = rows
@@ -160,7 +188,7 @@ def get_radar(source, columns, rows):
 
     labels = columns
     fig1 = plt.figure(figsize=(6, 6))
-    radar = ComplexRadar(fig1, labels, data2, functions_to_plot)
+    radar = ComplexRadar(fig1, labels, [data2], functions_to_plot)
     return radar
 
 

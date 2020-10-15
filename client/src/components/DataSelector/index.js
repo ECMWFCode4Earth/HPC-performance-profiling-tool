@@ -15,10 +15,6 @@ export const DataSelector = (props) => {
         }
     }, [props, selection]);
 
-    useEffect(() => {
-        console.log('rerander')
-    }, []);
-
 
     const setSelection1 = props.setSelection;
     React.useEffect(() => {
