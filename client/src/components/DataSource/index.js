@@ -10,17 +10,18 @@ const _DataSource = (props) => {
     // TODO the datasoruce disappers in when it is not here
 
     const [dataSource, setDataSource] = useState([]);
+    const [dataSources, setDataSources] = useState([0]);
     useEffect(() => {
         axios.get('/data-sources').then(e => {
             setDataSource(e.data);
             if (props.mapping?.mapping && props.mapping?.mapping[-(-props.id)] && document.getElementById("dataSource" + props.id)) {
-                if (typeof props.mapping?.mapping[-(-props.id)].val === 'string')
-                    document.getElementById("dataSource" + props.id).selectedIndex = e.data.indexOf(props.mapping?.mapping[-(-props.id)].val) + 1;
-                else {
-                    setValue(true);
-                    document.getElementById("dataSource" + props.id).selectedIndex = e.data.indexOf(props.mapping?.mapping[-(-props.id)].val[0]) + 1;
-                    document.getElementById("dataSourceCompare" + props.id).selectedIndex = e.data.indexOf(props.mapping?.mapping[-(-props.id)].val[1]) + 1;
-                }
+                // if (typeof props.mapping?.mapping[-(-props.id)].val === 'string')
+                //     document.getElementById("dataSource" + props.id).selectedIndex = e.data.indexOf(props.mapping?.mapping[-(-props.id)].val) + 1;
+                // else {
+                //     setValue(true);
+                //     document.getElementById("dataSource" + props.id).selectedIndex = e.data.indexOf(props.mapping?.mapping[-(-props.id)].val[0]) + 1;
+                //     document.getElementById("dataSourceCompare" + props.id).selectedIndex = e.data.indexOf(props.mapping?.mapping[-(-props.id)].val[1]) + 1;
+                // }
             }
         });
         // eslint-disable-next-line
@@ -28,7 +29,7 @@ const _DataSource = (props) => {
 
 
 
-    const [value, setValue] = useState(false);
+    const [value, setValue] = useState([true]);
 
     useEffect(() => {
         console.log(value)
@@ -37,10 +38,13 @@ const _DataSource = (props) => {
         <div style={{ padding: '40px' }}>
             <form style={{ display: 'flex', flexDirection: 'column' }} onInput={() => {
                 var arr = [];
-                if (!value)
-                    arr = document.getElementById('dataSource' + props.id).value;
-                else
-                    arr = [document.getElementById('dataSource' + props.id).value, document.getElementById('dataSourceCompare' + props.id).value]
+
+                for (let i = 0; i < dataSources.length; i++) {
+                    if (value[i])
+                        arr.push(document.getElementById(`dataSource${i}` + props.id).value)
+                }
+                console.log(arr);
+                // arr = [document.getElementById('dataSource' + props.id).value, document.getElementById('dataSourceCompare' + props.id).value]
 
                 dispatch(mappingElementsAction({
                     id: props.id,
@@ -49,7 +53,7 @@ const _DataSource = (props) => {
                 }))
             }}>
                 <label htmlFor="dataSource">Choose a dataSource:</label>
-                <select style={{ textTransform: 'capitalize', margin: '20px', marginLeft: '40px' }}
+                {/* <select style={{ textTransform: 'capitalize', margin: '20px', marginLeft: '40px' }}
                     name="dataSource"
                     id={"dataSource" + props.id}
                     defaultValue='DEFAULT'>
@@ -62,13 +66,17 @@ const _DataSource = (props) => {
                             >{el.replace('.csv', '').replace(/_/g, ' ')}</option>
                         })
                     }
-                </select>
-                <label htmlFor="dataSource">Compare with:</label>
-                <div>
-                    <input type='checkbox' checked={value} onChange={e => setValue(!value)} />
-                    <select style={{ textTransform: 'capitalize', margin: '20px', marginTop: '10px' }} disabled={!value}
+                </select> */}
+
+                {dataSources.map((e, idx) => <div>
+                    <input type='checkbox' checked={value[idx]} onChange={e => setValue(val => {
+                        let value = [...val];
+                        value[idx] = !val[idx];
+                        return value;
+                    })} />
+                    <select style={{ textTransform: 'capitalize', margin: '20px', marginTop: '10px' }} disabled={!value[idx]}
                         name="dataSource"
-                        id={"dataSourceCompare" + props.id}
+                        id={`dataSource${idx}` + props.id}
                         defaultValue='DEFAULT'>
                         <option value="DEFAULT" disabled hidden>Choose data-source</option>
                         {
@@ -80,8 +88,19 @@ const _DataSource = (props) => {
                             })
                         }
                     </select>
-                </div>
+                </div>)}
             </form>
+
+            {dataSources.length >= 1 &&
+                <>
+                    <label htmlFor="dataSource">Compare with:</label>
+                    <button onClick={e => {
+                        setValue([...value, false]);
+                        e.preventDefault();
+                        setDataSources(source => [...source, source.length + 1])
+                    }}> Add Data Source </button>
+                </>
+            }
         </div>
     )
 }

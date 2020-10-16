@@ -11,7 +11,7 @@ from collections import defaultdict
 
 
 def get_sunburst(source, columns, rows):
-    df = pd.read_csv('./profile-data/' + source)
+    df = pd.read_csv('./profile-data/' + source[0])
     # plot the function from the example_omp18_papi.csv
     if rows == None:
         rows = df.head(100).tail(2)["Function"].to_list() + ['delta_eddington_scat_od', 'cloud_optics']
@@ -87,19 +87,17 @@ class ComplexRadar():
         x = [(self.data[x].min() - (self.data[x].max() - self.data[x].min()) / 5, self.data[x].max() + (self.data[x].max() - self.data[x].min()) / 5) for x in self.labels] 
         return x
         
-    def __init__(self, fig, labels, data, functions_to_plot,
+    def __init__(self, fig, labels, data, functions_to_plot, dataSourcesLen, sourceName,
                  n_ordinate_levels=6):
         # calculate the ranges and the labels
         self.functions_to_plot = functions_to_plot
-        
+        self.sourceName = sourceName
         self.labels = labels
+        self.dataLen = dataSourcesLen
         self.data = data[0]
-        try:
-            self.data_second = data[1]
-            self.ranges = self.create_ranges(pd.concat([data[0], data[1]]))
-        except:
-            self.ranges = self.create_ranges()
+        self.dataSources = data
         
+        self.ranges = self.create_ranges(pd.concat(data))
         ranges = self.ranges
         
         angles = np.arange(0, 360, 360./len(labels))
@@ -135,60 +133,50 @@ class ComplexRadar():
         self.angle = np.deg2rad(np.r_[angles, angles[0]])
         self.ax = axes[0]
 
-    def _plot(self, data, label, line='-'):
+    def _plot(self, data, label, line='-', color='r'):
         sdata = self._scale_data(data, self.ranges)
-        self.ax.plot(self.angle, np.r_[sdata, sdata[0]], line, label=label)
+        self.ax.plot(self.angle, np.r_[sdata, sdata[0]], line + color, label=label)
 
     def plot(self):
         lines = []
-        for label in self.functions_to_plot:
-            vars_plt = self.data.loc[self.data['Function'] == label][self.labels].values.tolist()[0]
-            self._plot(vars_plt, label)
-            lines.append(vars_plt)
-        try:
-            for label in self.functions_to_plot:
-                vars_plt = self.data_second.loc[self.data_second['Function'] == label][self.labels].values.tolist()[0]
-                self._plot(vars_plt, label + 'Opt', '--')
+        colors = ['r', 'b', 'g', 'k', 'h']
+        linesStyle = ['-', '--', '-.', ':']
+        for i in range(self.dataLen):
+            for index, label in enumerate(self.functions_to_plot):
+                vars_plt = self.dataSources[i].loc[self.dataSources[i]['Function'] == label][self.labels].values.tolist()[0]
+                self._plot(vars_plt, label + '____' + self.sourceName[i], line=linesStyle[i], color = colors[index])
                 lines.append(vars_plt)
-        except:
-            print('Simple data')
         self.ax.legend(bbox_to_anchor=(1.3, 1))
         return self.ax
     def fill(self, data, *args, **kw):
         sdata = self._scale_data(data, self.ranges)
         self.ax.fill(self.angle, np.r_[sdata, sdata[0]], *args, **kw)
 
-
 def get_radar(source, columns, rows):
     font = {
         'weight' : 'normal',
         'size'   : 12
     }
+    if columns == [] or rows == []:
+        return
 
     plt.rc('font', **font)
-    if isinstance(source, list):
-        labels = columns
-        functions_to_plot = rows
 
-        data = pd.read_csv('./profile-data/' + source[0])
-        data2 = data.loc[data['Function'].isin(functions_to_plot)]
-
-        data_complex = pd.read_csv('./profile-data/' + source[1])
-        data_complex2 = data_complex.loc[data_complex['Function'].isin(functions_to_plot)]
-        fig1 = plt.figure(figsize=(6, 6))
-        radar = ComplexRadar(fig1, labels, [data2, data_complex2], functions_to_plot)
-        return radar
-
-
-
-    data = pd.read_csv('./profile-data/' + source)
-
-    functions_to_plot = rows
-    data2 = data.loc[data['Function'].isin(functions_to_plot)]
-
+    dataSources = []
+    dataSourcesLen = 0
+    if not isinstance(source, list):
+        source = [source]
+    
     labels = columns
-    fig1 = plt.figure(figsize=(6, 6))
-    radar = ComplexRadar(fig1, labels, [data2], functions_to_plot)
+    functions_to_plot = rows
+    for s in source:
+        data = pd.read_csv('./profile-data/' + s)
+        dataFile = data.loc[data['Function'].isin(functions_to_plot)]
+        dataSources.append(dataFile)
+        dataSourcesLen += 1
+
+    fig1 = plt.figure(figsize=(10, 10))
+    radar = ComplexRadar(fig1, labels, dataSources, functions_to_plot, dataSourcesLen, sourceName=source)
     return radar
 
 
