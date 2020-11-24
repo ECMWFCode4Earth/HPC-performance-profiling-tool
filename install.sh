@@ -1,13 +1,18 @@
 #!/bin/bash
 
-sudo apt install curl
-sudo apt install python3-pip 
-sudo apt install python3-venv
+if [ "$EUID" -ne 0 ]
+  then echo "Please run as root"
+  exit
+fi
 
-curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
-echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
-sudo apt update
-sudo apt install yarn
+apt install curl
+apt install python3-pip 
+apt install python3-venv
+
+curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
+echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
+apt update
+apt install yarn
 cd client
 yarn
 
