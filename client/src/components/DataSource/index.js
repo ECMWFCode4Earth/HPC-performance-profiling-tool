@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useDispatch, connect } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { mappingElementsAction } from '../../store';
+import colors from "../../utils/colors";
 
 const _DataSource = (props) => {
     // get value for select from the server
@@ -11,6 +13,8 @@ const _DataSource = (props) => {
 
     const [dataSource, setDataSource] = useState([]);
     const [dataSources, setDataSources] = useState([0]);
+    let id = props.id;
+    const selected = useSelector(state => state.state.selected);
     useEffect(() => {
         axios.get('/data-sources').then(e => {
             setDataSource(e.data);
@@ -31,11 +35,11 @@ const _DataSource = (props) => {
 
     const [value, setValue] = useState([true]);
 
-    useEffect(() => {
-        console.log(value)
-    }, [value])
     return (
-        <div style={{ padding: '40px' }}>
+        <div style={{
+            padding: '40px',
+            backgroundColor: [...selected].map(element => element.id).includes(id) ? colors.selectedColor : colors.unselectedColor,
+        }}>
             <form style={{ display: 'flex', flexDirection: 'column' }} onInput={() => {
                 var arr = [];
 
@@ -53,20 +57,6 @@ const _DataSource = (props) => {
                 }))
             }}>
                 <label htmlFor="dataSource">Choose a dataSource:</label>
-                {/* <select style={{ textTransform: 'capitalize', margin: '20px', marginLeft: '40px' }}
-                    name="dataSource"
-                    id={"dataSource" + props.id}
-                    defaultValue='DEFAULT'>
-                    <option value="DEFAULT" disabled hidden>Choose data-source</option>
-                    {
-                        dataSource && dataSource.map((el, key) => {
-                            return <option key={key}
-                                style={{ textTransform: 'capitalize' }}
-                                value={el}
-                            >{el.replace('.csv', '').replace(/_/g, ' ')}</option>
-                        })
-                    }
-                </select> */}
 
                 {dataSources.map((e, idx) => <div>
                     <input type='checkbox' checked={value[idx]} onChange={e => setValue(val => {

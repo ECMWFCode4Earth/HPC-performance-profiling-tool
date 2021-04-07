@@ -6,8 +6,19 @@ const initialState = {};
 const TRIGGER_UPDATE = 'TRIGGER_UPDATE';
 const ADD_ELEMENTS = 'ADD_ELEMENTS';
 const ID_MAPPING = 'ID_MAPPING';
+const SELECTED = 'SELECTED';
 
 // Create Id value mapping
+
+
+function stateReducer(state = initialState, action) {
+  switch (action.type) {
+    case SELECTED:
+      return { ...state, selected: [...action.payload] };
+    default:
+      return state;
+  }
+}
 
 function updateReducer(state = initialState, action) {
   switch (action.type) {
@@ -61,14 +72,16 @@ export const mappingElementsAction = (mapping) => {
 }
 
 export const rootReducer = combineReducers({
+  state: stateReducer,
   elements: addReducer,
   mapping: idMappingReducer,
   flow: updateReducer
 });
 
+const middlewares = false ? [logger] : [];
 const store = configureStore({
   reducer: rootReducer,
-  middleware: [logger],
+  middleware: [...middlewares],
   preloadedState: initialState
 });
 

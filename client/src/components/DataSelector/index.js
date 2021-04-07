@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import Plot from 'react-plotly.js';
+import { useSelector } from 'react-redux';
+import colors from "../../utils/colors";
 
 export const DataSelector = (props) => {
     const [data, setData] = useState();
     const [selection, setSelection] = useState('Sunburst');
 
+    const selected = useSelector(state => state.state.selected);
     const options = ['Sunburst', 'Spider Web', 'Roofline'];
     useEffect(() => {
         try {
@@ -16,6 +19,9 @@ export const DataSelector = (props) => {
     }, [props, selection]);
 
 
+    console.log(props);
+
+
     const setSelection1 = props.setSelection;
     React.useEffect(() => {
         setSelection1(selection);
@@ -23,7 +29,7 @@ export const DataSelector = (props) => {
 
     return (
         <div style={{
-            backgroundColor: 'white',
+            backgroundColor: [...selectedFromStore].map(element => element.id).includes(id) ? colors.selectedColor : colors.unselectedColor,
             height: '200px',
             width: '200px'
         }}>

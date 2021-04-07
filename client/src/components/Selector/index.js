@@ -2,11 +2,11 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { mappingElementsAction } from '../../store';
 import { useSelector, useDispatch, connect } from 'react-redux';
+import colors from "../../utils/colors";
 
 const getFlow = (id, flows) => {
     var x = { id: null, flow: null };
-    console.log(id)
-    console.log(flows)
+
     Object.keys(flows).forEach(i => {
         console.log(flows[i].chain)
         console.log(flows[i])
@@ -40,6 +40,7 @@ const getRequest = ({ flow, id, mapping }) => {
 const _Selector = (props) => {
     // TODO BUG can not set selected index of null; can not reproduce
     const dispatch = useDispatch();
+    const selectedFromStore = useSelector(state => state.state.selected);
     const [dataSource, setDataSource] = useState([]);
     const [selected, setSelected] = useState([]);
     const [disabled, setDisabled] = useState(true);
@@ -81,7 +82,7 @@ const _Selector = (props) => {
                 flexDirection:'row',
                 flexWrap:'wrap',
                 width: '300px',
-                backgroundColor: '#f3f3f3',
+                backgroundColor: [...selectedFromStore].map(element => element.id).includes(id) ? colors.selectedColor : colors.unselectedColor,
                 marginBottom: '10px'
             }}>
                 {

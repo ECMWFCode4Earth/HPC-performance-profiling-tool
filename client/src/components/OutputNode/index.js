@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { DataDisplay } from '../';
 import { useSelector } from 'react-redux';
 import axios from 'axios';
+import colors from "../../utils/colors";
 
 async function getImageData({ flow, id, mapping }, url) {
     let requestObject = {};
@@ -66,7 +67,7 @@ export const OutputNode = (data) => {
 
     const flow = useSelector(state => state.flow.flow);
     const mapping = useSelector(state => state.mapping);
-
+    const selected = useSelector(state => state.state.selected);
     const [url, setUrl] = useState('Sunburst');
     const [result, setResult] = useState();
 
@@ -79,7 +80,6 @@ export const OutputNode = (data) => {
             return;
         }
 
-
         const x = getRequest({ ...getFlow(id, flow), ...mapping }, url);
         if (x) {
             axios.post('/getPlot', {
@@ -89,17 +89,19 @@ export const OutputNode = (data) => {
     }, [mapping, id, flow, url]);
 
 
-
-    // TODO check the state and if we are connected to something; fetch data
-
     return (
-        <div style={{ maxWidth: '600px', height: '600px', width: '600px' }}>
+        <div style={{
+            maxWidth: '600px',
+            height: '600px',
+            width: '600px',
+            backgroundColor: [...selected].map(element => element.id).includes(id) ? colors.selectedColor : colors.unselectedColor,
+        }}>
             {type === 'text' ? (result ? <pre style={{ maxWidth: '500px' }}>
                 {JSON.stringify(result, undefined, 2)}
             </pre> : <>
-                    <h1> Output text </h1>
-                    <h2> Please choose a data flow</h2>
-                </>) : <DataDisplay data={result} id={id} setSelection={setUrl} />
+                <h1> Output text </h1>
+                <h2> Please choose a data flow</h2>
+            </>) : <DataDisplay data={result} id={id} setSelection={setUrl} />
             }
         </div>
     );

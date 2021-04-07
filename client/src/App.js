@@ -36,6 +36,14 @@ const BasicGraph = ({ elements, setElements }) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
+    dispatch({
+      type: "SELECTED",
+      payload: [...selected],
+    })
+  }, [selected])
+
+
+  useEffect(() => {
     const removeEls = (myArray, toRemove) => {
       for (let i = myArray.length - 1; i >= 0; i--) {
         for (let j = 0; j < toRemove.length; j++) {
@@ -91,7 +99,7 @@ const BasicGraph = ({ elements, setElements }) => {
   );
 
   useEffect(() => {
-// There are some connection issues also they do not keep the state
+    // There are some connection issues also they do not keep the state
     if (copy && paste) {
       const res = [
         ...elements,
@@ -99,7 +107,7 @@ const BasicGraph = ({ elements, setElements }) => {
           let element = elements.filter(elem => elem.id === e.id);
           if (!element || !element.length > 0)
             return null;
-          let newE = {...element[0]};
+          let newE = { ...element[0] };
 
           if (newE?.type === 'customNode') {
             newE.position = { x: 300, y: 900 + (index) * (200) };
@@ -120,11 +128,6 @@ const BasicGraph = ({ elements, setElements }) => {
     }
 
   }, [clipboard, paste, elements, copy, setElements]);
-
-
-  useEffect(() => {
-    console.log(elements)
-  }, [elements])
 
 
   const onConnect = (params) => {
@@ -323,7 +326,7 @@ export default function App() {
                 fontSize: "30px"
               }}>
               Dashboard Menu
-          </p>
+            </p>
           </div>
           {
             sideBarObject.map((e, idx) =>

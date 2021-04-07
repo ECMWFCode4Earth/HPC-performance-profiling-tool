@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from 'react'
 import Plot from 'react-plotly.js';
+import { useSelector } from 'react-redux';
+import colors from "../../utils/colors";
 
 export const DataDisplay = (props) => {
     // the data contains the data and the layout data
     const [data, setData] = useState();
     const [selection, setSelection] = useState('Sunburst');
-
+    const selected = useSelector(state => state.state.selected);
     const options = ['Sunburst', 'Spider Web', 'Roofline'];
+    let id = props.id;
     useEffect(() => {
         try {
             setData(JSON.parse(props.data.data));
@@ -26,8 +29,8 @@ export const DataDisplay = (props) => {
 
     return (
         <div style={{
-            backgroundColor: 'white',
             height: '200px',
+            backgroundColor: [...selected].map(element => element.id).includes(id) ? colors.selectedColor : colors.unselectedColor,
             width: '200px'
         }}>
             <select name="graph-type" id="graph-type" onInput={e => setSelection(e.target.value)}>
@@ -44,9 +47,9 @@ export const DataDisplay = (props) => {
                         />
                     }
                 </>) : <>
-                        <h1> Display data </h1>
-                        <h2> Please choose a data flow</h2>
-                    </>
+                    <h1> Display data </h1>
+                    <h2> Please choose a data flow</h2>
+                </>
             }
         </div>
     )
