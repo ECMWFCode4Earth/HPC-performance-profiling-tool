@@ -9,8 +9,13 @@ import networkx as nx
 import random
 from collections import defaultdict
 
+plt.switch_backend('Agg')
+
 
 def get_sunburst(source, columns, rows):
+    print (source)
+    print (columns)
+    print (rows)
     df = pd.read_csv('./profile-data/' + source[0])
     # plot the function from the example_omp18_papi.csv
     if rows == None:
@@ -47,6 +52,7 @@ def get_sunburst(source, columns, rows):
             df_new['value'] = list(df[i].values()) # really do not remember what this is for
         else:
             df_new['parent'] = list(df[i].values())
+    print(df_new)
     fig = px.sunburst(
         df_new,
         names='function_name',
@@ -178,7 +184,6 @@ def get_radar(source, columns, rows):
     fig1 = plt.figure(figsize=(10, 10))
     radar = ComplexRadar(fig1, labels, dataSources, functions_to_plot, dataSourcesLen, sourceName=source)
     return radar
-
 
 def get_DAG(depth = 3, labelName = None):
     # graph plots
