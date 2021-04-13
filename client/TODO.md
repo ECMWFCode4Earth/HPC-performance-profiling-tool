@@ -22,3 +22,7 @@
 // TODO: add selector with the graph from plotly
 // WHEN NOT focused the items loose their props
 // But keep the data; this is a issue with the randering; force a rerander at the start
+// IDS can be strings and this is not correct
+// The root reducer is bonckers
+// There is too much jsx in this code, nothing is reused
+// Selected chain color change
