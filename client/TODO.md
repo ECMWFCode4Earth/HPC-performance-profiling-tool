@@ -26,3 +26,4 @@
 // The root reducer is bonckers
 // There is too much jsx in this code, nothing is reused
 // Selected chain color change
+// Select box change for multiple items
