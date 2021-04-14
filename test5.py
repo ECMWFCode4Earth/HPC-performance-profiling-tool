@@ -1,7 +1,3 @@
-import sys
-
-sys.setrecursionlimit(1976)
-
 f5 = open("callgraph.json","r")
 f6 = open("callgraph_distinct.txt","w")
 f7 = open("callgraph_full.txt","w")
@@ -27,10 +23,6 @@ for i in range(0,len(lines7)-1):
         f8.write(lines7[i])
 f8.write(lines7[len(lines7)-1])
 f6.close()
-
-
-
-
 
 
 def add(sample_dict, key, list_of_values):
@@ -93,7 +85,7 @@ x = 0
 lst = []
 for i in range(1,65):
 		lst.append(lst1[i])
-#lst1 = [('WVCOUPLE_INIT_EARLY','WVWAMDECOMP'), ('mike','john'), ('mike','hellen'), ('john','elisa')]
+
 from collections import defaultdict 
 sample_dict3 = defaultdict()
 
@@ -104,12 +96,7 @@ for i in sample_dict2.keys():
 	sample_dict3[i.strip()]= list(filter(lambda y: y != "],", map(lambda x: str(x).strip(), sample_dict2[i])))
 del sample_dict3["*"]
 del sample_dict3["],"]
-#print(sample_dict3)
 
-
-
-import networkx as nx
-G = nx.Graph()
 
 
 roots = ["MASTER"]
@@ -134,34 +121,8 @@ def clean_json(string):
     return string
 
 traverse(sample_dict3, "MASTER", 0)
-print(clean_json(_str_end)[:-2])
-# # Build a directed graph and a list of all names that have no parent
-# graph = {name: set() for tup in lst1 for name in tup}
-# has_parent = {name: False for tup in lst1 for name in tup}
-# for parent, child in lst1:
-#     graph[parent].add(child)
-#     has_parent[child] = True
-# # All names that have absolutely no parent:
-# roots = [name for name, parents in has_parent.items() if not parents]
-
-
-
-# # traversal of the graph (doesn't care about duplicates and cycles)
-# def traverse(hierarchy, graph, names):
-#     for name in names:
-#         hierarchy[name] = traverse({}, graph, graph[name])   
-#     return hierarchy
-
-
-# print(traverse({}, graph, roots))
-
-# {'mike': {'hellen': {}, 'john': {'elisa': {}, 'marry': {}}}}
-
-
-#del sample_dict2["*\n"]
-
-#f3.write(str(sample_dict2))
-
+with open("result.json", "w+") as result:
+    result.write(clean_json(_str_end)[:-2])
 
 f1.close()
 f2.close()
