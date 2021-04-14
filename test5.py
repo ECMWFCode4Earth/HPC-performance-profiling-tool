@@ -16,7 +16,7 @@ for i in range(0,len(lines5)):
     if x not in ["],\n","}\n","{\n","]\n"]:
         y.add(x)
 for i in y:
-    f6.write(i) #.strip()
+    f6.write(i)
     f6.write("\n")
 
 f7.close()
@@ -68,7 +68,6 @@ ok = 1
 for key in sample_dict:
     sample_dict2[key] = list(set(sample_dict[key]))
     if key not in ["*\n","],\n"]:
-#        if key.startswith("'],\n") == False:
         f3.write('name: "')
         f3.write(key.replace("\n","")) 
         f3.write('",\n')
@@ -85,26 +84,16 @@ lst1 = []
 for key in sample_dict:
     sample_dict2[key] = list(set(sample_dict[key]))
     for i in sample_dict2[key]:
-    	#print(key,':')
-    	#print(i)
     	x = str(key).replace("\n","")
     	y = str(i).replace("\n","")
     	tup1 = tuple([x,y])
     	lst1.append(tup1)
 
-#tup = tuple(['x','y'])
-#print(tup)lst1.append(tup)
-#print(type(lst1))
 x = 0
 lst = []
-#print(len(lst1))
 for i in range(1,65):
-#		print(lst1[i])
 		lst.append(lst1[i])
-#print(lst) 
 #lst1 = [('WVCOUPLE_INIT_EARLY','WVWAMDECOMP'), ('mike','john'), ('mike','hellen'), ('john','elisa')]
-#print(type(lst1))
-#print(sample_dict2)
 from collections import defaultdict 
 sample_dict3 = defaultdict()
 
@@ -123,12 +112,29 @@ import networkx as nx
 G = nx.Graph()
 
 
-for i in sample_dict3.keys():
-#	print(i)
-	for j in sample_dict3[i]:
-		G.add_edge(i,j)
-print(G.adj)
+roots = ["MASTER"]
+_str_end = ""
+def traverse(_dict, root, depth, lastChild = False):
+    global _str_end
+    _str_end += "{\n\"name\" : \"" + root + "\",\n"
+    _str_end += "\"value\" : 0,\n"
+    _str_end += "\"path\" : \"\","
+    _str_end += "\"depth\" : " + str(depth) + ",\n"
+    _str_end += "\"children\" : [\n"
+    depth += 1
+    for index, node in enumerate(_dict[root]):
+        traverse(_dict, node, depth, index == len(_dict) - 1)
+    depth -= 1
 
+    _str_end += "]\n},\n"
+import re
+def clean_json(string):
+    string = re.sub(",[ \t\r\n]+}", "}", string)
+    string = re.sub(",[ \t\r\n]+\]", "]", string)
+    return string
+
+traverse(sample_dict3, "MASTER", 0)
+print(clean_json(_str_end)[:-2])
 # # Build a directed graph and a list of all names that have no parent
 # graph = {name: set() for tup in lst1 for name in tup}
 # has_parent = {name: False for tup in lst1 for name in tup}
